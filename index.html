@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Қазақстан өсімдіктері — Ботаникалық Атлас</title>
+
+<!-- Tailwind CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          serif: ['Fraunces', 'serif'],
+          sans:  ['Inter', 'system-ui', 'sans-serif'],
+        },
+        colors: {
+          ink:'#0e1b15', forest:'#13322b', moss:'#1f5240', sage:'#7ea892',
+          mint:'#c8dfd0', cream:'#f6f3ec', paper:'#fbfaf6', sand:'#e8e0cf',
+          clay:'#b6764a', gold:'#c8975a', berry:'#7e2d3f', sky:'#5d8fa0',
+        },
+        boxShadow: {
+          soft: '0 10px 40px -12px rgba(14, 27, 21, 0.18)',
+          cardlift: '0 30px 60px -20px rgba(14, 27, 21, 0.28)',
+        },
+        borderRadius: { '4xl': '2rem' },
+      }
+    }
+  };
+</script>
+
+<style>
+  :root { color-scheme: light; --mx:0; --my:0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #fbfaf6;
+    color: #0e1b15;
+    overflow-x: hidden;
+    cursor: none;
+  }
+  .font-display { font-family: 'Fraunces', serif; }
+  .no-cursor, .no-cursor * { cursor: none !important; }
+
+  /* ─── Paper texture ─── */
+  .bg-paper-grain {
+    background-color: #fbfaf6;
+    background-image:
+      radial-gradient(circle at 20% 15%, rgba(200,151,90,0.05) 0, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(31,82,64,0.06) 0, transparent 45%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.08 0 0 0 0 0.10 0 0 0 0 0.08 0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+
+  /* ─── Custom cursor ─── */
+  .cursor-dot, .cursor-ring {
+    position: fixed; top:0; left:0; pointer-events:none; z-index:9999;
+    border-radius:9999px; transform: translate(-50%,-50%);
+    mix-blend-mode: difference;
+  }
+  .cursor-dot  { width:6px;  height:6px;  background:#f6f3ec; transition: transform .15s; }
+  .cursor-ring { width:38px; height:38px; border:1px solid #f6f3ec; transition: transform .35s cubic-bezier(.2,.7,.2,1), width .25s, height .25s, border-color .25s, background .25s; }
+  .cursor-ring.hover { width:72px; height:72px; background: rgba(200,151,90,.25); border-color: #c8975a; }
+
+  /* ─── Scroll progress ─── */
+  #progress {
+    position: fixed; top:0; left:0; height:2px; width:0%;
+    background: linear-gradient(90deg,#c8975a,#b6764a,#7e2d3f);
+    z-index: 80; transition: width .12s linear;
+  }
+
+  /* ─── Reveal ─── */
+  .reveal { opacity:0; transform: translateY(36px); transition: opacity 1s ease, transform 1s cubic-bezier(.2,.7,.2,1); }
+  .reveal.visible { opacity:1; transform:none; }
+  .reveal-delay-1.visible { transition-delay: .12s; }
+  .reveal-delay-2.visible { transition-delay: .24s; }
+  .reveal-delay-3.visible { transition-delay: .36s; }
+  .reveal-delay-4.visible { transition-delay: .48s; }
+
+  /* ─── Hero title split-letter ─── */
+  .split-char {
+    display:inline-block; opacity:0; transform: translateY(60px) rotate(8deg);
+    animation: charIn .9s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  @keyframes charIn {
+    to { opacity:1; transform: none; }
+  }
+
+  /* ─── Floating ornaments ─── */
+  @keyframes floatY { 0%,100%{ transform: translateY(0) rotate(0); } 50%{ transform: translateY(-22px) rotate(6deg); } }
+  @keyframes floatX { 0%,100%{ transform: translateX(0) rotate(0); } 50%{ transform: translateX(18px) rotate(-4deg); } }
+  @keyframes spinSlow { from{ transform: rotate(0); } to{ transform: rotate(360deg); } }
+  @keyframes pulseGold { 0%,100%{ box-shadow: 0 0 0 0 rgba(200,151,90,.5);} 50%{ box-shadow: 0 0 0 22px rgba(200,151,90,0);} }
+  .a-floatY { animation: floatY 9s ease-in-out infinite; }
+  .a-floatX { animation: floatX 11s ease-in-out infinite; }
+  .a-spin   { animation: spinSlow 30s linear infinite; }
+  .a-pulse  { animation: pulseGold 3s ease-out infinite; }
+
+  /* Parallax to mouse */
+  .par-1 { transform: translate3d(calc(var(--mx) * 18px), calc(var(--my) * 18px), 0); transition: transform .4s ease-out; }
+  .par-2 { transform: translate3d(calc(var(--mx) * -26px), calc(var(--my) * -14px), 0); transition: transform .5s ease-out; }
+  .par-3 { transform: translate3d(calc(var(--mx) * 10px), calc(var(--my) * -22px), 0); transition: transform .35s ease-out; }
+
+  /* ─── Marquee ─── */
+  .marquee {
+    display: flex; gap: 3rem;
+    animation: marquee 35s linear infinite;
+    width: max-content;
+  }
+  .marquee:hover { animation-play-state: paused; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ─── Underline link ─── */
+  .ul-anim { background-image: linear-gradient(currentColor,currentColor); background-size: 0% 1px; background-repeat: no-repeat; background-position: 0 100%; transition: background-size .5s cubic-bezier(.2,.7,.2,1); }
+  .ul-anim:hover { background-size: 100% 1px; }
+
+  /* ─── Plant tiles ─── */
+  .plant-tile {
+    transform-style: preserve-3d;
+    transition: transform .5s cubic-bezier(.2,.7,.2,1), box-shadow .5s ease;
+    will-change: transform;
+  }
+  .plant-tile:hover { box-shadow: 0 40px 60px -25px rgba(14,27,21,.45); }
+  .plant-tile img { transition: transform 1.2s cubic-bezier(.2,.7,.2,1), filter .7s ease; will-change: transform; }
+  .plant-tile:hover img { transform: scale(1.1); filter: saturate(1.15); }
+
+  /* ─── Sticky scrub for distribution list ─── */
+  .reg-item { position: relative; overflow: hidden; }
+  .reg-item::after {
+    content:''; position: absolute; left:0; right:0; bottom:0; height:0;
+    background: linear-gradient(180deg, transparent, rgba(200,151,90,.12));
+    transition: height .5s cubic-bezier(.2,.7,.2,1);
+  }
+  .reg-item:hover::after { height: 100%; }
+  .reg-item .arrow { display:inline-block; transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+  .reg-item:hover .arrow { transform: translateX(10px); }
+
+  /* ─── Magnetic button ─── */
+  .magnet { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+
+  /* ─── Modal anim ─── */
+  .modal-anim { animation: modalIn .55s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes modalIn { from{ opacity:0; transform: translateY(20px) scale(.97);} to{ opacity:1; transform:none;} }
+
+  /* ─── Custom scrollbar inside modal ─── */
+  .nice-scroll::-webkit-scrollbar { width: 6px; }
+  .nice-scroll::-webkit-scrollbar-thumb { background: rgba(31,82,64,.3); border-radius: 4px; }
+
+  /* ─── Taxonomy section leaves ─── */
+  .leaf-bg::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600' viewBox='0 0 600 600' fill='none' stroke='rgba(255,255,255,0.07)' stroke-width='1'><path d='M100 500 Q 300 100 500 500'/><path d='M300 50 Q 100 300 300 550'/><path d='M50 300 Q 300 100 550 300'/></svg>");
+    background-repeat: no-repeat; background-size: cover; background-position: center;
+  }
+
+  /* hide native cursor on small touch devices */
+  @media (hover: none) {
+    body { cursor: auto; }
+    .cursor-dot, .cursor-ring { display: none; }
+  }
+</style>
+</head>
+
+<body class="bg-paper-grain antialiased">
+
+<!-- Scroll progress -->
+<div id="progress"></div>
+
+<!-- Custom cursor -->
+<div class="cursor-ring" id="curRing"></div>
+<div class="cursor-dot"  id="curDot"></div>
+
+<!-- ─── NAV ─── -->
+<nav id="topnav" class="fixed top-0 inset-x-0 z-50 transition-all duration-500">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 py-4 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-3 group" data-cursor="hover">
+      <span class="w-9 h-9 rounded-full bg-forest text-cream flex items-center justify-center font-display text-lg group-hover:rotate-[20deg] transition-transform duration-500">Ф</span>
+      <span class="font-display text-lg tracking-wide">Флора <em class="text-gold not-italic font-medium">Қазақстан</em></span>
+    </a>
+    <ul class="hidden md:flex items-center gap-9 text-[12px] tracking-[0.18em] uppercase text-ink/70">
+      <li><a href="#intro"        class="ul-anim" data-cursor="hover">Шолу</a></li>
+      <li><a href="#plants"       class="ul-anim" data-cursor="hover">Каталог</a></li>
+      <li><a href="#distribution" class="ul-anim" data-cursor="hover">Таралу</a></li>
+      <li><a href="#taxonomy"     class="ul-anim" data-cursor="hover">Жүйелеу</a></li>
+    </ul>
+    <a href="#plants" data-cursor="hover" class="magnet hidden md:inline-flex items-center gap-2 text-xs tracking-widest uppercase font-medium bg-forest text-cream px-5 py-2.5 rounded-full hover:bg-moss transition">
+      Атласты ашу
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<header class="relative min-h-screen pt-32 pb-24 lg:pb-32 overflow-hidden" id="hero">
+  <!-- Decorative SVG leaves with parallax -->
+  <svg class="hidden lg:block absolute -top-10 -left-10 w-72 h-72 text-moss/15 par-1 a-floatY" viewBox="0 0 200 200" fill="currentColor"><path d="M100 10c50 30 80 80 80 130-50 0-100-40-100-100 0-10 10-20 20-30z"/></svg>
+  <svg class="hidden lg:block absolute bottom-10 right-10 w-96 h-96 text-gold/15 par-2 a-floatX" viewBox="0 0 200 200" fill="currentColor"><path d="M50 150c-30-30-30-90 0-120 50 20 90 60 100 110-40 20-80 20-100 10z"/></svg>
+  <svg class="hidden lg:block absolute top-1/3 right-1/4 w-40 h-40 text-clay/15 par-3 a-floatY" style="animation-delay:-4s" viewBox="0 0 200 200" fill="currentColor"><circle cx="100" cy="100" r="80"/></svg>
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 relative">
+    <div class="grid lg:grid-cols-12 gap-10 lg:gap-16 items-end">
+
+      <!-- LEFT -->
+      <div class="lg:col-span-7">
+        <div class="flex items-center gap-3 text-xs tracking-[0.3em] uppercase text-moss font-medium mb-8 reveal">
+          <span class="w-10 h-px bg-moss"></span>
+          Ботаникалық атлас · 2025
+        </div>
+        <h1 id="heroTitle" class="font-display font-light text-[clamp(48px,8vw,128px)] leading-[0.95] text-ink">
+          <span class="block" data-split>Қазақстан</span>
+          <span class="block italic text-clay" data-split>өсімдіктері</span>
+          <span class="inline-block align-middle ml-2 w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-gold/20 border border-gold/40 a-pulse a-spin"></span>
+        </h1>
+        <p class="mt-8 max-w-xl font-display italic text-[clamp(18px,2vw,24px)] text-ink/60 font-light leading-snug reveal reveal-delay-3">
+          Морфология, систематика және таралу аймақтары — бес түрге арналған визуалды зерттеу.
+        </p>
+
+        <div class="mt-10 flex flex-wrap items-center gap-8 reveal reveal-delay-4">
+          <a href="#plants" data-cursor="hover" class="magnet group inline-flex items-center gap-3 bg-ink text-cream px-7 py-4 rounded-full text-sm tracking-wide hover:bg-forest transition">
+            Каталогты қарау
+            <span class="w-8 h-8 rounded-full bg-gold/90 text-ink flex items-center justify-center group-hover:translate-x-1 transition">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </span>
+          </a>
+          <a href="#distribution" data-cursor="hover" class="ul-anim text-sm tracking-wide text-ink/70 hover:text-ink transition">
+            Таралу картасы →
+          </a>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="lg:col-span-5 reveal reveal-delay-2">
+        <div class="relative grid grid-cols-6 grid-rows-6 gap-3 h-[460px] lg:h-[560px]">
+          <figure class="col-span-4 row-span-6 rounded-3xl overflow-hidden bg-forest relative group plant-tile">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Ottawa%20tulip%20festival%20(I0015047)%20(cropped).jpg?width=900" alt="" loading="lazy" class="w-full h-full object-cover saturate-[0.95]">
+            <div class="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent"></div>
+            <figcaption class="absolute bottom-4 left-4 text-cream text-xs tracking-[0.2em] uppercase backdrop-blur-md bg-ink/40 px-3 py-1.5 rounded-full">Tulipa · Қызғалдақ</figcaption>
+          </figure>
+          <figure class="col-span-2 row-span-3 rounded-3xl overflow-hidden plant-tile">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Syringa.vulgaris(01).jpg?width=500" alt="" loading="lazy" class="w-full h-full object-cover">
+          </figure>
+          <figure class="col-span-2 row-span-3 rounded-3xl overflow-hidden bg-clay/20 flex items-center justify-center p-4 text-center plant-tile">
+            <div>
+              <div class="font-display text-5xl text-forest leading-none" data-count="5">0</div>
+              <div class="text-[10px] tracking-[0.25em] uppercase text-moss mt-2">түр<br>4 тұқымдас</div>
+            </div>
+          </figure>
+        </div>
+      </div>
+    </div>
+
+    <!-- Marquee -->
+    <div class="mt-20 border-y border-ink/10 py-5 overflow-hidden reveal">
+      <div class="marquee text-ink/40 font-display italic text-lg">
+        <span>Rosaceae · <em class="text-clay">Pyrus communis</em></span><span>·</span>
+        <span>Oleaceae · <em class="text-clay">Syringa vulgaris</em></span><span>·</span>
+        <span>Asteraceae · <em class="text-clay">Taraxacum officinale</em></span><span>·</span>
+        <span>Berberidaceae · <em class="text-clay">Berberis vulgaris</em></span><span>·</span>
+        <span>Liliaceae · <em class="text-clay">Tulipa L.</em></span><span>·</span>
+        <span>Rosaceae · <em class="text-clay">Pyrus communis</em></span><span>·</span>
+        <span>Oleaceae · <em class="text-clay">Syringa vulgaris</em></span><span>·</span>
+        <span>Asteraceae · <em class="text-clay">Taraxacum officinale</em></span><span>·</span>
+        <span>Berberidaceae · <em class="text-clay">Berberis vulgaris</em></span><span>·</span>
+        <span>Liliaceae · <em class="text-clay">Tulipa L.</em></span><span>·</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── INTRO ─── -->
+<section id="intro" class="py-24 lg:py-36 relative">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 grid lg:grid-cols-12 gap-12 lg:gap-20">
+    <div class="lg:col-span-5 reveal">
+      <div class="flex items-center gap-3 text-xs tracking-[0.3em] uppercase text-moss font-medium mb-6">
+        <span class="w-10 h-px bg-moss"></span>
+        Зерттеу туралы
+      </div>
+      <h2 class="font-display font-light text-[clamp(36px,5vw,68px)] leading-[1.05] text-ink">
+        Қазақстанның <em class="text-clay">бай</em> өсімдіктер дүниесі
+      </h2>
+    </div>
+    <div class="lg:col-span-7 reveal reveal-delay-2 space-y-6 text-ink/75 leading-relaxed">
+      <p class="text-lg">Қазақстан — Орталық Азияның ең ірі мемлекеті. Оның аумағында биік таулардан шөлді даланы кесіп өтетін, түрге бай флора қалыптасқан.</p>
+      <p>Осы диссертациялық жұмыста бес өсімдік түрінің <em class="font-display not-italic font-medium">морфологиялық ерекшеліктері</em>, <em class="font-display not-italic font-medium">систематикалық жағдайы</em> және <em class="font-display not-italic font-medium">таралу аймақтары</em> зерттелді.</p>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-ink/10 mt-12 rounded-2xl overflow-hidden">
+        <div class="bg-paper p-6 reveal reveal-delay-1">
+          <div class="font-display text-5xl text-forest leading-none" data-count="5">0</div>
+          <div class="mt-3 text-[11px] tracking-[0.2em] uppercase text-ink/60">Зерттелген түр</div>
+        </div>
+        <div class="bg-paper p-6 reveal reveal-delay-2">
+          <div class="font-display text-5xl text-forest leading-none" data-count="4">0</div>
+          <div class="mt-3 text-[11px] tracking-[0.2em] uppercase text-ink/60">Тұқымдас</div>
+        </div>
+        <div class="bg-paper p-6 reveal reveal-delay-3">
+          <div class="font-display text-5xl text-clay leading-none"><span data-count="35">0</span><span class="text-xl align-top">+</span></div>
+          <div class="mt-3 text-[11px] tracking-[0.2em] uppercase text-ink/60">Қызғалдақ түрі<br>Қазақстанда</div>
+        </div>
+        <div class="bg-paper p-6 reveal reveal-delay-4">
+          <div class="font-display text-5xl text-clay leading-none"><span data-count="400">0</span><span class="text-xl align-top">+</span></div>
+          <div class="mt-3 text-[11px] tracking-[0.2em] uppercase text-ink/60">Барбарис<br>туысының түрлері</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PLANTS ─── -->
+<section id="plants" class="py-24 lg:py-32 bg-cream relative">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16 reveal">
+      <div>
+        <div class="flex items-center gap-3 text-xs tracking-[0.3em] uppercase text-moss font-medium mb-5">
+          <span class="w-10 h-px bg-moss"></span>
+          Каталог · 01 — 05
+        </div>
+        <h2 class="font-display font-light text-[clamp(34px,4.5vw,60px)] leading-tight text-ink max-w-xl">
+          Зерттелген <em class="text-clay">өсімдіктер</em>
+        </h2>
+      </div>
+      <p class="max-w-sm text-ink/60 text-sm">
+        Толық сипаттаманы оқу үшін кез келген картаны басыңыз. Деректер морфология, систематика және ареал бойынша құрылымдалған.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 lg:gap-5">
+
+      <!-- 01 ALMURT -->
+      <article data-modal="almurt" data-cursor="hover" class="plant-tile group col-span-12 md:col-span-7 row-span-2 relative rounded-4xl overflow-hidden bg-forest text-cream min-h-[420px] reveal reveal-delay-1">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Poires%20williams%20Vertes%20et%20Rouges%20Savoie.jpg?width=900" alt="Алмұрт" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-75">
+        <div class="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/35 to-transparent"></div>
+        <div class="absolute top-6 left-6 right-6 flex items-start justify-between">
+          <span class="text-[10px] tracking-[0.3em] uppercase bg-cream/15 backdrop-blur-md text-cream px-3 py-1.5 rounded-full">01 · Rosaceae</span>
+          <span class="text-[10px] tracking-[0.2em] uppercase bg-gold/90 text-ink px-3 py-1.5 rounded-full">Ағаш</span>
+        </div>
+        <div class="absolute left-6 right-6 bottom-6">
+          <div class="font-display italic text-cream/70 mb-1">Pyrus communis L.</div>
+          <h3 class="font-display text-5xl lg:text-6xl font-light leading-none">Алмұрт</h3>
+          <p class="mt-4 text-cream/85 text-sm max-w-md leading-relaxed">Еуропа мен Азияның қоңыржай климатты аймақтарында таралған жеміс ағашы. Биіктігі 5–25 м, жемісі — пектин мен С дәруменіне бай.</p>
+          <div class="mt-5 inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-gold">
+            Толық оқу
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </article>
+
+      <!-- 02 SIREN -->
+      <article data-modal="siren" data-cursor="hover" class="plant-tile group col-span-12 sm:col-span-6 md:col-span-5 relative rounded-4xl overflow-hidden bg-sand min-h-[260px] reveal reveal-delay-2">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Syringa.vulgaris(01).jpg?width=700" alt="Сирень" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-tr from-berry/75 via-berry/20 to-transparent"></div>
+        <div class="absolute inset-0 p-6 flex flex-col justify-between text-cream">
+          <div class="flex items-start justify-between">
+            <span class="text-[10px] tracking-[0.3em] uppercase bg-cream/15 backdrop-blur-md px-3 py-1.5 rounded-full">02 · Oleaceae</span>
+            <span class="text-[10px] tracking-[0.2em] uppercase bg-cream text-ink px-3 py-1.5 rounded-full">Бұта</span>
+          </div>
+          <div>
+            <div class="font-display italic text-cream/85 mb-1">Syringa vulgaris L.</div>
+            <h3 class="font-display text-4xl font-light">Сирень</h3>
+          </div>
+        </div>
+      </article>
+
+      <!-- 03 BAKBAK -->
+      <article data-modal="bakbak" data-cursor="hover" class="plant-tile group col-span-12 sm:col-span-6 md:col-span-5 relative rounded-4xl overflow-hidden bg-gold/30 min-h-[260px] reveal reveal-delay-3">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Dandelion%20flower%20head%20(2008-05-04%20pic02).jpg?width=700" alt="Бақбақ" loading="lazy" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-br from-ink/60 to-transparent"></div>
+        <div class="absolute inset-0 p-6 flex flex-col justify-between text-cream">
+          <div class="flex items-start justify-between">
+            <span class="text-[10px] tracking-[0.3em] uppercase bg-cream/15 backdrop-blur-md px-3 py-1.5 rounded-full">03 · Asteraceae</span>
+            <span class="text-[10px] tracking-[0.2em] uppercase bg-cream text-ink px-3 py-1.5 rounded-full">Шөп</span>
+          </div>
+          <div>
+            <div class="font-display italic text-cream/85 mb-1">Taraxacum officinale</div>
+            <h3 class="font-display text-4xl font-light">Бақбақ</h3>
+          </div>
+        </div>
+      </article>
+
+      <!-- 04 BARBARIS -->
+      <article data-modal="barbaris" data-cursor="hover" class="plant-tile group col-span-12 md:col-span-7 row-span-2 relative rounded-4xl overflow-hidden bg-berry min-h-[420px] reveal reveal-delay-2">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Berberis_vulgaris_.jpg?width=900" alt="Барбарис" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-85">
+        <div class="absolute inset-0 bg-gradient-to-t from-ink/80 via-berry/30 to-transparent"></div>
+        <div class="absolute top-6 left-6 right-6 flex items-start justify-between">
+          <span class="text-[10px] tracking-[0.3em] uppercase bg-cream/15 backdrop-blur-md text-cream px-3 py-1.5 rounded-full">04 · Berberidaceae</span>
+          <span class="text-[10px] tracking-[0.2em] uppercase bg-gold/90 text-ink px-3 py-1.5 rounded-full">400+ түр</span>
+        </div>
+        <div class="absolute left-6 right-6 bottom-6 text-cream">
+          <div class="font-display italic text-cream/70 mb-1">Berberis vulgaris L.</div>
+          <h3 class="font-display text-5xl lg:text-6xl font-light leading-none">Барбарис</h3>
+          <p class="mt-4 text-cream/85 text-sm max-w-md leading-relaxed">Тікенекті бұта туысы. Жемісі — қышқыл қызыл жидек, С дәруменіне өте бай. Биіктігі 1–5 м.</p>
+          <div class="mt-5 inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-gold">
+            Толық оқу
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </article>
+
+      <!-- 05 TULIP -->
+      <article data-modal="qyzgaldak" data-cursor="hover" class="plant-tile group col-span-12 md:col-span-5 relative rounded-4xl overflow-hidden bg-moss min-h-[420px] reveal reveal-delay-3 text-cream">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Tulipa%20orphanidea%20060506.jpg?width=800" alt="Қызғалдақ" loading="lazy" class="absolute inset-0 w-full h-full object-cover opacity-75">
+        <div class="absolute inset-0 bg-gradient-to-t from-forest via-forest/35 to-transparent"></div>
+        <div class="absolute top-6 left-6 right-6 flex items-start justify-between">
+          <span class="text-[10px] tracking-[0.3em] uppercase bg-cream/15 backdrop-blur-md px-3 py-1.5 rounded-full">05 · Liliaceae</span>
+          <span class="text-[10px] tracking-[0.2em] uppercase bg-gold/90 text-ink px-3 py-1.5 rounded-full">Эндемик</span>
+        </div>
+        <div class="absolute left-6 right-6 bottom-6">
+          <div class="font-display italic text-cream/70 mb-1">Tulipa L.</div>
+          <h3 class="font-display text-5xl font-light leading-none">Қызғалдақ</h3>
+          <p class="mt-4 text-cream/85 text-sm leading-relaxed">Орталық Азияның символы. Қазақстанда 35-тен астам жабайы түрі кездеседі. Іле Алатауы мен Тянь-Шаньда жиі ұшырасады.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ─── DISTRIBUTION ─── -->
+<section id="distribution" class="py-24 lg:py-36">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10">
+    <div class="grid lg:grid-cols-12 gap-10 lg:gap-16">
+      <div class="lg:col-span-5 reveal lg:sticky lg:top-32 self-start">
+        <div class="flex items-center gap-3 text-xs tracking-[0.3em] uppercase text-moss font-medium mb-6">
+          <span class="w-10 h-px bg-moss"></span>
+          Таралу аймақтары
+        </div>
+        <h2 class="font-display font-light text-[clamp(32px,4vw,56px)] leading-tight text-ink">
+          Қызғалдақтың негізгі <em class="text-clay">таралу</em> орындары
+        </h2>
+        <p class="mt-6 text-ink/65 leading-relaxed">
+          Қазақстанның оңтүстік-шығыс таулы аймақтары қызғалдақтардың табиғи орталығы болып табылады. Барбарис пен сирень туыстары әлемнің басқа аймақтарында кездеседі.
+        </p>
+        <a href="#taxonomy" data-cursor="hover" class="mt-8 inline-flex items-center gap-3 text-sm tracking-wide text-ink hover:text-clay transition group">
+          Жүйелеу кестесіне өту
+          <span class="w-10 h-px bg-ink group-hover:bg-clay group-hover:w-16 transition-all duration-500"></span>
+        </a>
+      </div>
+
+      <ol class="lg:col-span-7 reveal border-y border-ink/10">
+        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
+          <span class="col-span-1 font-display italic text-clay text-lg">01</span>
+          <span class="col-span-7 font-display text-2xl text-ink">Қаратау</span>
+          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Tulipa sp.</span>
+          <span class="col-span-1 arrow text-ink/40">→</span>
+        </li>
+        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
+          <span class="col-span-1 font-display italic text-clay text-lg">02</span>
+          <span class="col-span-7 font-display text-2xl text-ink">Тянь-Шань</span>
+          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Tulipa sp.</span>
+          <span class="col-span-1 arrow text-ink/40">→</span>
+        </li>
+        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
+          <span class="col-span-1 font-display italic text-clay text-lg">03</span>
+          <span class="col-span-7 font-display text-2xl text-ink">Іле Алатауы</span>
+          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Tulipa sp.</span>
+          <span class="col-span-1 arrow text-ink/40">→</span>
+        </li>
+        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
+          <span class="col-span-1 font-display italic text-clay text-lg">04</span>
+          <span class="col-span-7 font-display text-2xl text-ink">Жетісу Алатауы</span>
+          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Tulipa sp.</span>
+          <span class="col-span-1 arrow text-ink/40">→</span>
+        </li>
+        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
+          <span class="col-span-1 font-display italic text-clay text-lg">05</span>
+          <span class="col-span-7 font-display text-2xl text-ink">Бетпақдала</span>
+          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Tulipa sp.</span>
+          <span class="col-span-1 arrow text-ink/40">→</span>
+        </li>
+        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
+          <span class="col-span-1 font-display italic text-clay text-lg">06</span>
+          <span class="col-span-7 font-display text-2xl text-ink">Мойынқұм</span>
+          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Tulipa sp.</span>
+          <span class="col-span-1 arrow text-ink/40">→</span>
+        </li>
+        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
+          <span class="col-span-1 font-display italic text-clay text-lg">07</span>
+          <span class="col-span-7 font-display text-2xl text-ink">Солтүстік Америка</span>
+          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Berberis sp.</span>
+          <span class="col-span-1 arrow text-ink/40">→</span>
+        </li>
+        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2" data-cursor="hover">
+          <span class="col-span-1 font-display italic text-clay text-lg">08</span>
+          <span class="col-span-7 font-display text-2xl text-ink">Оңтүстік-Шығыс Еуропа</span>
+          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Syringa sp.</span>
+          <span class="col-span-1 arrow text-ink/40">→</span>
+        </li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TAXONOMY ─── -->
+<section id="taxonomy" class="relative py-24 lg:py-32 bg-forest text-cream overflow-hidden leaf-bg">
+  <!-- Floating ornaments -->
+  <svg class="hidden lg:block absolute top-20 right-10 w-48 h-48 text-gold/15 a-floatY" viewBox="0 0 200 200" fill="currentColor"><path d="M100 20c40 20 60 60 60 100-40 0-80-40-80-80 0-10 10-15 20-20z"/></svg>
+  <svg class="hidden lg:block absolute bottom-10 left-10 w-32 h-32 text-mint/15 a-floatX" viewBox="0 0 200 200" fill="currentColor"><circle cx="100" cy="100" r="80"/></svg>
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 relative">
+    <div class="grid lg:grid-cols-12 gap-6 lg:gap-10 mb-14 reveal">
+      <div class="lg:col-span-8">
+        <div class="flex items-center gap-3 text-xs tracking-[0.3em] uppercase text-mint/70 font-medium mb-6">
+          <span class="w-10 h-px bg-gold"></span>
+          Жүйелеу · Taxonomy
+        </div>
+        <h2 class="font-display font-light text-[clamp(32px,4vw,60px)] leading-tight">
+          Систематикалық <em class="text-gold">кесте</em>
+        </h2>
+      </div>
+      <p class="lg:col-span-4 self-end text-cream/60 max-w-sm">
+        Тұқымдас, туыс және өсу формасы бойынша салыстырмалы топтастыру.
+      </p>
+    </div>
+
+    <div class="reveal overflow-x-auto -mx-6 lg:mx-0 px-6 lg:px-0">
+      <table class="w-full min-w-[720px]">
+        <thead>
+          <tr class="text-[10px] tracking-[0.25em] uppercase text-cream/45 border-b border-cream/15">
+            <th class="text-left font-normal py-4 pr-4">Атауы</th>
+            <th class="text-left font-normal py-4 pr-4">Латынша</th>
+            <th class="text-left font-normal py-4 pr-4">Тұқымдас</th>
+            <th class="text-left font-normal py-4 pr-4">Туыс</th>
+            <th class="text-left font-normal py-4 pr-4">Форма</th>
+            <th class="text-left font-normal py-4">Таралуы</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          <tr class="border-b border-cream/10 hover:bg-cream/5 transition">
+            <td class="py-5 pr-4 font-display text-xl font-light">Алмұрт</td>
+            <td class="py-5 pr-4 italic text-cream/60"><em>Pyrus communis</em></td>
+            <td class="py-5 pr-4 text-cream/80">Rosaceae</td>
+            <td class="py-5 pr-4 text-cream/80">Pyrus</td>
+            <td class="py-5 pr-4"><span class="inline-block px-3 py-1 rounded-full text-[10px] tracking-[0.15em] uppercase bg-mint/15 text-mint">Ағаш</span></td>
+            <td class="py-5 text-cream/70">Еуропа, Азия</td>
+          </tr>
+          <tr class="border-b border-cream/10 hover:bg-cream/5 transition">
+            <td class="py-5 pr-4 font-display text-xl font-light">Сирень</td>
+            <td class="py-5 pr-4 italic text-cream/60"><em>Syringa vulgaris</em></td>
+            <td class="py-5 pr-4 text-cream/80">Oleaceae</td>
+            <td class="py-5 pr-4 text-cream/80">Syringa</td>
+            <td class="py-5 pr-4"><span class="inline-block px-3 py-1 rounded-full text-[10px] tracking-[0.15em] uppercase bg-gold/20 text-gold">Бұта</span></td>
+            <td class="py-5 text-cream/70">ОШ Еуропа, Азия</td>
+          </tr>
+          <tr class="border-b border-cream/10 hover:bg-cream/5 transition">
+            <td class="py-5 pr-4 font-display text-xl font-light">Бақбақ</td>
+            <td class="py-5 pr-4 italic text-cream/60"><em>Taraxacum officinale</em></td>
+            <td class="py-5 pr-4 text-cream/80">Asteraceae</td>
+            <td class="py-5 pr-4 text-cream/80">Taraxacum</td>
+            <td class="py-5 pr-4"><span class="inline-block px-3 py-1 rounded-full text-[10px] tracking-[0.15em] uppercase bg-sky/20 text-sky">Шөп</span></td>
+            <td class="py-5 text-cream/70">Қоңыржай белдеу</td>
+          </tr>
+          <tr class="border-b border-cream/10 hover:bg-cream/5 transition">
+            <td class="py-5 pr-4 font-display text-xl font-light">Барбарис</td>
+            <td class="py-5 pr-4 italic text-cream/60"><em>Berberis vulgaris</em></td>
+            <td class="py-5 pr-4 text-cream/80">Berberidaceae</td>
+            <td class="py-5 pr-4 text-cream/80">Berberis</td>
+            <td class="py-5 pr-4"><span class="inline-block px-3 py-1 rounded-full text-[10px] tracking-[0.15em] uppercase bg-gold/20 text-gold">Бұта</span></td>
+            <td class="py-5 text-cream/70">Еуропа, Азия, Америка</td>
+          </tr>
+          <tr class="hover:bg-cream/5 transition">
+            <td class="py-5 pr-4 font-display text-xl font-light">Қызғалдақ</td>
+            <td class="py-5 pr-4 italic text-cream/60"><em>Tulipa</em> spp.</td>
+            <td class="py-5 pr-4 text-cream/80">Liliaceae</td>
+            <td class="py-5 pr-4 text-cream/80">Tulipa</td>
+            <td class="py-5 pr-4"><span class="inline-block px-3 py-1 rounded-full text-[10px] tracking-[0.15em] uppercase bg-sky/20 text-sky">Пиязшықты шөп</span></td>
+            <td class="py-5 text-cream/70">Орталық Азия, Қазақстан</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="bg-ink text-cream/65 relative overflow-hidden">
+  <svg class="absolute -bottom-20 -right-20 w-96 h-96 text-gold/5 a-spin" viewBox="0 0 200 200" fill="currentColor"><circle cx="100" cy="100" r="80"/></svg>
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 py-20 grid lg:grid-cols-12 gap-12 relative">
+    <div class="lg:col-span-5">
+      <div class="flex items-center gap-3 mb-6">
+        <span class="w-10 h-10 rounded-full bg-gold/90 text-ink flex items-center justify-center font-display text-xl">Ф</span>
+        <span class="font-display text-2xl text-cream">Флора <em class="text-gold not-italic">Қазақстан</em></span>
+      </div>
+      <p class="max-w-md text-sm leading-relaxed">
+        Диссертациялық жұмыс · 2025 жыл. Қазақстанның бес өсімдік түрінің морфологиясы, систематикасы және таралу аймақтарына арналған визуалды зерттеу.
+      </p>
+    </div>
+
+    <div class="lg:col-span-3">
+      <div class="text-[10px] tracking-[0.3em] uppercase text-cream/40 mb-5">Атлас</div>
+      <ul class="space-y-3 text-sm">
+        <li><a href="#intro" data-cursor="hover" class="ul-anim hover:text-gold transition">Шолу</a></li>
+        <li><a href="#plants" data-cursor="hover" class="ul-anim hover:text-gold transition">Каталог</a></li>
+        <li><a href="#distribution" data-cursor="hover" class="ul-anim hover:text-gold transition">Таралу</a></li>
+        <li><a href="#taxonomy" data-cursor="hover" class="ul-anim hover:text-gold transition">Жүйелеу</a></li>
+      </ul>
+    </div>
+
+    <div class="lg:col-span-4">
+      <div class="text-[10px] tracking-[0.3em] uppercase text-cream/40 mb-5">Деректер</div>
+      <p class="text-sm leading-relaxed mb-5">Барлық деректер ботаникалық зерттеулерге, ашық дереккөздер мен Қазақстан флорасының каталогтарына негізделген.</p>
+      <p class="text-xs text-cream/35 mt-6">© 2025 · Botanical Atlas KZ</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ─── MODAL ─── -->
+<div id="modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 lg:p-10 bg-ink/70 backdrop-blur-md">
+  <div class="modal-anim relative w-full max-w-5xl max-h-[90vh] bg-paper rounded-3xl overflow-hidden grid lg:grid-cols-12 shadow-cardlift">
+    <button id="modal-close" data-cursor="hover" class="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-ink/80 text-cream hover:bg-ink hover:rotate-90 flex items-center justify-center transition-all duration-300" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+    </button>
+    <div class="lg:col-span-5 relative bg-forest min-h-[260px] lg:min-h-full overflow-hidden">
+      <img id="modal-img" src="" alt="" class="absolute inset-0 w-full h-full object-cover">
+      <div class="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent"></div>
+      <div class="absolute bottom-6 left-6 right-6 text-cream">
+        <div id="modal-family" class="text-[10px] tracking-[0.3em] uppercase text-gold mb-2"></div>
+        <h3 id="modal-kk" class="font-display text-4xl lg:text-5xl font-light leading-none"></h3>
+        <div id="modal-lat" class="font-display italic text-cream/70 mt-2"></div>
+      </div>
+    </div>
+    <div id="modal-body" class="lg:col-span-7 p-8 lg:p-12 overflow-y-auto nice-scroll max-h-[90vh]"></div>
+  </div>
+</div>
+
+<!-- ─── JS ─── -->
+<script>
+const PEAR_IMG = "https://commons.wikimedia.org/wiki/Special:FilePath/Poires%20williams%20Vertes%20et%20Rouges%20Savoie.jpg?width=900";
+const LILAC_IMG = "https://commons.wikimedia.org/wiki/Special:FilePath/Syringa.vulgaris(01).jpg?width=900";
+const DAND_IMG = "https://commons.wikimedia.org/wiki/Special:FilePath/Dandelion%20flower%20head%20(2008-05-04%20pic02).jpg?width=900";
+const BARB_IMG = "https://commons.wikimedia.org/wiki/Special:FilePath/Berberis_vulgaris_.jpg?width=900";
+const TULIP_IMG = "https://commons.wikimedia.org/wiki/Special:FilePath/Tulipa%20orphanidea%20060506.jpg?width=900";
+
+const plants = {
+  almurt: {
+    img: PEAR_IMG, kk: "Алмұрт", lat: "Pyrus communis L.", family: "Rosaceae · Раушангүлділіктер",
+    sections: [
+      ["Тұқымдасы", "Rosaceae (Раушангүлділіктер) тұқымдасына жатады."],
+      ["Морфологиясы", "Биіктігі 5–25 метрге дейін жетеді. Тамыр жүйесі тереңге кетеді. Жапырақтары жай, кезектесіп орналасқан, жиектері ара тісті. Гүлдері ақ немесе ақшыл қызғылт, гүлшоғыры қалқанша типті."],
+      ["Жемісі", "Шырынды жалған жеміс. Құрамында қант, органикалық қышқылдар, пектин, дәрумендер және минералды заттар болады. Әсіресе С дәрумені мен калийге бай."],
+      ["Экологиясы", "Жарық пен жылуды жақсы көреді. Құнарлы және ылғалды топырақта жақсы өседі. Негізінен жәндіктер арқылы тозаңданады."]
+    ]
+  },
+  siren: {
+    img: LILAC_IMG, kk: "Сирень", lat: "Syringa vulgaris L.", family: "Oleaceae · Жасминділер",
+    sections: [
+      ["Тұқымдасы", "Oleaceae (Жасминділер) тұқымдасына жатады."],
+      ["Морфологиясы", "Биіктігі 2–8 метрге жететін көпжылдық бұта. Жапырақтары қарама-қарсы, жүрек тәрізді. Гүлдері ұсақ, түтікше, хош иісті, метелка типтес гүлшоғырында жиналған."],
+      ["Гүлдеу мерзімі", "Сәуір–мамыр айларында молынан гүлдейді. Гүлдерінің түсі ақтан күлгінге дейін әртүрлі реңктерде кездеседі."],
+      ["Қолданылуы", "Парктер мен бақтарда сәндік мақсатта кеңінен өсіріледі. Эфир майы парфюмерияда қолданылады."]
+    ]
+  },
+  bakbak: {
+    img: DAND_IMG, kk: "Бақбақ", lat: "Taraxacum officinale F.H.Wigg.", family: "Asteraceae · Күрделігүлділер",
+    sections: [
+      ["Тұқымдасы", "Asteraceae (Күрделігүлділер) тұқымдасына жатады."],
+      ["Морфологиясы", "Көпжылдық шөптесін өсімдік. Тамыры жуан, ұзын, өзекті. Жапырақтары негізгі розеткада жиналған, ойықты. Гүл сабағы қуыс."],
+      ["Биологиялық ерекшеліктері", "Барлық бөлігінде ақ сүтті шырын болады. Тұқымдары парашют тәрізді талшықтармен жабдықталған, жел арқылы үлкен қашықтыққа таралады."],
+      ["Дәрілік маңызы", "Тамыры мен жапырағы дәстүрлі медицинада бауыр, өт жолдары ауруларын емдеуде қолданылады."]
+    ]
+  },
+  barbaris: {
+    img: BARB_IMG, kk: "Барбарис", lat: "Berberis vulgaris L.", family: "Berberidaceae · Барбарисгүлділер",
+    sections: [
+      ["Тұқымдасы", "Berberidaceae (Барбарисгүлділер) тұқымдасына жатады. 400-ден астам түрі бар туыс."],
+      ["Морфологиясы", "Биіктігі 1–5 метрге дейін жететін тікенекті бұта. Бұтақтары қабырғалы, үш бөлікті тікенектермен жабдықталған."],
+      ["Жемісі", "Сопақша келген қышқыл қызыл жидек. Құрамында С және Е дәрумендері, органикалық қышқылдар көп."],
+      ["Таралуы", "Еуропа, Азия, Солтүстік Америка және Қазақстанда кездеседі. Тас көп жерлер мен орман шеттерін ұнатады."]
+    ]
+  },
+  qyzgaldak: {
+    img: TULIP_IMG, kk: "Қызғалдақ", lat: "Tulipa L.", family: "Liliaceae · Лалагүлділер",
+    sections: [
+      ["Тұқымдасы", "Liliaceae (Лалагүлділер) тұқымдасына жатады."],
+      ["Морфологиясы", "Көпжылдық пиязшықты өсімдік. Сабағы тік, биіктігі 10–70 см. Жапырақтары ұзынша-ланцет тәрізді, кезектесіп орналасқан."],
+      ["Гүлдеу", "Гүлдері ірі, жалғыз, әртүрлі түсте: қызыл, сары, ақ, қызғылт. Сәуір–мамыр айларында гүлдейді."],
+      ["Қазақстандағы орны", "Қазақстанда 35-тен астам жабайы түрі тіркелген. Қаратау, Тянь-Шань, Іле Алатауы, Жетісу Алатауы, Бетпақдала және Мойынқұм өңірлерінде өседі. Көптеген түрлері Қызыл кітапқа енгізілген."]
+    ]
+  }
+};
+
+/* ── Modal ── */
+const modal     = document.getElementById('modal');
+const modalImg  = document.getElementById('modal-img');
+const modalKk   = document.getElementById('modal-kk');
+const modalLat  = document.getElementById('modal-lat');
+const modalFam  = document.getElementById('modal-family');
+const modalBody = document.getElementById('modal-body');
+
+function openModal(id) {
+  const p = plants[id]; if (!p) return;
+  modalImg.src = p.img; modalImg.alt = p.kk;
+  modalKk.textContent  = p.kk;
+  modalLat.textContent = p.lat;
+  modalFam.textContent = p.family;
+  modalBody.innerHTML = p.sections.map(([t,b], i) => `
+    <div class="${i>0?'mt-8 pt-8 border-t border-ink/10':''}" style="opacity:0; transform:translateY(20px); animation: charIn .7s cubic-bezier(.2,.7,.2,1) ${i*120}ms forwards;">
+      <div class="text-[10px] tracking-[0.3em] uppercase text-clay font-medium mb-3">${String(i+1).padStart(2,'0')} · ${t}</div>
+      <p class="text-ink/80 leading-relaxed">${b}</p>
+    </div>`).join('');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('[data-modal]').forEach(el => el.addEventListener('click', () => openModal(el.dataset.modal)));
+document.getElementById('modal-close').addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ── Reveal on scroll ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ── Hero title split-letter animation ── */
+document.querySelectorAll('#heroTitle [data-split]').forEach((line, li) => {
+  const text = line.textContent;
+  line.innerHTML = '';
+  [...text].forEach((ch, i) => {
+    const span = document.createElement('span');
+    span.className = 'split-char';
+    span.textContent = ch === ' ' ? '\u00A0' : ch;
+    span.style.animationDelay = (li * 0.25 + i * 0.04) + 's';
+    line.appendChild(span);
+  });
+});
+
+/* ── Count-up ── */
+const cIo = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = +el.dataset.count;
+    const dur = 1400;
+    const start = performance.now();
+    function tick(t) {
+      const p = Math.min(1, (t - start) / dur);
+      const ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * ease);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    cIo.unobserve(el);
+  });
+}, { threshold: 0.4 });
+document.querySelectorAll('[data-count]').forEach(el => cIo.observe(el));
+
+/* ── Nav scroll style + progress bar ── */
+const nav = document.getElementById('topnav');
+const progress = document.getElementById('progress');
+function onScroll() {
+  const y = window.scrollY;
+  if (y > 30) nav.classList.add('bg-paper/85','backdrop-blur-xl','border-b','border-ink/10','shadow-soft');
+  else nav.classList.remove('bg-paper/85','backdrop-blur-xl','border-b','border-ink/10','shadow-soft');
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  progress.style.width = (max > 0 ? (y / max * 100) : 0) + '%';
+}
+onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+
+/* ── Mouse parallax ── */
+const hero = document.getElementById('hero');
+window.addEventListener('mousemove', e => {
+  const x = (e.clientX / window.innerWidth - 0.5) * 2;
+  const y = (e.clientY / window.innerHeight - 0.5) * 2;
+  hero.style.setProperty('--mx', x);
+  hero.style.setProperty('--my', y);
+});
+
+/* ── Custom cursor ── */
+const curDot = document.getElementById('curDot');
+const curRing = document.getElementById('curRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; curDot.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`; });
+function loop() {
+  rx += (mx - rx) * 0.18;
+  ry += (my - ry) * 0.18;
+  curRing.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+  requestAnimationFrame(loop);
+}
+loop();
+document.querySelectorAll('[data-cursor="hover"]').forEach(el => {
+  el.addEventListener('mouseenter', () => curRing.classList.add('hover'));
+  el.addEventListener('mouseleave', () => curRing.classList.remove('hover'));
+});
+
+/* ── Magnetic buttons ── */
+document.querySelectorAll('.magnet').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const r = btn.getBoundingClientRect();
+    const x = e.clientX - r.left - r.width / 2;
+    const y = e.clientY - r.top - r.height / 2;
+    btn.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
+  });
+  btn.addEventListener('mouseleave', () => btn.style.transform = '');
+});
+
+/* ── 3D tilt on plant tiles ── */
+document.querySelectorAll('#plants .plant-tile').forEach(tile => {
+  tile.addEventListener('mousemove', e => {
+    const r = tile.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width  - 0.5;
+    const y = (e.clientY - r.top)  / r.height - 0.5;
+    tile.style.transform = `perspective(900px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-6px)`;
+  });
+  tile.addEventListener('mouseleave', () => tile.style.transform = '');
+});
+</script>
+</body>
+</html>
