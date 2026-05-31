@@ -144,6 +144,65 @@
   /* ─── Magnetic button ─── */
   .magnet { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
 
+  /* ─── Map markers ─── */
+  .kz-marker {
+    position: absolute; transform: translate(-50%, -50%);
+    width: 28px; height: 28px; cursor: none;
+    z-index: 5;
+  }
+  .kz-marker .pin {
+    position: absolute; inset: 0; border-radius: 9999px;
+    background: #c8975a; border: 2px solid #fbfaf6;
+    box-shadow: 0 6px 14px -4px rgba(14,27,21,.45);
+    transition: transform .35s cubic-bezier(.2,.7,.2,1), background .3s;
+    transform: scale(.55);
+  }
+  .kz-marker .ripple {
+    position: absolute; inset: 0; border-radius: 9999px;
+    border: 1.5px solid #c8975a;
+    animation: kzRipple 2.4s ease-out infinite;
+  }
+  .kz-marker .ripple.r2 { animation-delay: .8s; }
+  .kz-marker:hover .pin,
+  .kz-marker.active .pin { transform: scale(1); background: #7e2d3f; }
+  .kz-marker.active .pin { box-shadow: 0 0 0 6px rgba(126,45,63,.15), 0 8px 18px -4px rgba(126,45,63,.5); }
+  @keyframes kzRipple {
+    0%   { transform: scale(.6); opacity: .8; }
+    100% { transform: scale(2.6); opacity: 0; }
+  }
+  .kz-marker .lbl {
+    position: absolute; top: 110%; left: 50%; transform: translateX(-50%);
+    white-space: nowrap; font-family: 'Fraunces', serif; font-size: 13px;
+    color: #0e1b15; background: rgba(251,250,246,.85); backdrop-filter: blur(6px);
+    padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(14,27,21,.08);
+    opacity: 0; transform: translate(-50%, 4px); transition: all .35s ease;
+    pointer-events: none;
+  }
+  .kz-marker:hover .lbl,
+  .kz-marker.active .lbl { opacity: 1; transform: translate(-50%, 0); }
+
+  /* Region list items */
+  .reg-row {
+    display: grid; grid-template-columns: auto 1fr auto auto;
+    gap: 1rem; align-items: center;
+    padding: 1rem .5rem; border-bottom: 1px solid rgba(14,27,21,.08);
+    cursor: none; transition: background .3s, padding .35s;
+    position: relative;
+  }
+  .reg-row:last-child { border-bottom: 0; }
+  .reg-row::before {
+    content:''; position: absolute; left:0; top:0; bottom:0; width: 2px;
+    background: #c8975a; transform: scaleY(0); transform-origin: top;
+    transition: transform .4s cubic-bezier(.2,.7,.2,1);
+  }
+  .reg-row:hover, .reg-row.active { padding-left: 1rem; background: rgba(200,151,90,.06); }
+  .reg-row:hover::before, .reg-row.active::before { transform: scaleY(1); }
+  .reg-row .num { font-family: 'Fraunces', serif; font-style: italic; color: #c8975a; font-size: 13px; min-width: 22px; }
+  .reg-row .nm  { font-family: 'Fraunces', serif; font-size: 17px; color: #0e1b15; }
+  .reg-row .tag { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: rgba(14,27,21,.45); }
+  .reg-row .arr { color: rgba(14,27,21,.35); transition: transform .4s; }
+  .reg-row:hover .arr, .reg-row.active .arr { transform: translateX(6px); color: #c8975a; }
+
   /* ─── Modal anim ─── */
   .modal-anim { animation: modalIn .55s cubic-bezier(.2,.7,.2,1) forwards; }
   @keyframes modalIn { from{ opacity:0; transform: translateY(20px) scale(.97);} to{ opacity:1; transform:none;} }
@@ -179,9 +238,14 @@
 <!-- ─── NAV ─── -->
 <nav id="topnav" class="fixed top-0 inset-x-0 z-50 transition-all duration-500">
   <div class="max-w-7xl mx-auto px-6 lg:px-10 py-4 flex items-center justify-between">
-    <a href="#" class="flex items-center gap-3 group" data-cursor="hover">
-      <span class="w-9 h-9 rounded-full bg-forest text-cream flex items-center justify-center font-display text-lg group-hover:rotate-[20deg] transition-transform duration-500">Ф</span>
-      <span class="font-display text-lg tracking-wide">Флора <em class="text-gold not-italic font-medium">Қазақстан</em></span>
+    <a href="#" class="flex items-center gap-3 group" data-cursor="hover" aria-label="Botanical Qazaqstan">
+      <span class="relative w-11 h-11 shrink-0 flex items-center justify-center transition-transform duration-500 group-hover:-rotate-6">
+        <img src="logo.png" alt="" class="w-11 h-11 object-contain select-none" draggable="false"/>
+      </span>
+      <span class="flex flex-col leading-none">
+        <span class="text-[9px] tracking-[0.32em] uppercase text-moss font-medium">Est · 2026</span>
+        <span class="font-display text-lg md:text-xl tracking-wide text-ink mt-1">Botanical <em class="text-clay not-italic font-medium">Qazaqstan</em></span>
+      </span>
     </a>
     <ul class="hidden md:flex items-center gap-9 text-[12px] tracking-[0.18em] uppercase text-ink/70">
       <li><a href="#intro"        class="ul-anim" data-cursor="hover">Шолу</a></li>
@@ -210,7 +274,7 @@
       <div class="lg:col-span-7">
         <div class="flex items-center gap-3 text-xs tracking-[0.3em] uppercase text-moss font-medium mb-8 reveal">
           <span class="w-10 h-px bg-moss"></span>
-          Ботаникалық атлас · 2025
+          Ботаникалық атлас · 2026
         </div>
         <h1 id="heroTitle" class="font-display font-light text-[clamp(48px,8vw,128px)] leading-[0.95] text-ink">
           <span class="block" data-split>Қазақстан</span>
@@ -287,7 +351,7 @@
     </div>
     <div class="lg:col-span-7 reveal reveal-delay-2 space-y-6 text-ink/75 leading-relaxed">
       <p class="text-lg">Қазақстан — Орталық Азияның ең ірі мемлекеті. Оның аумағында биік таулардан шөлді даланы кесіп өтетін, түрге бай флора қалыптасқан.</p>
-      <p>Осы диссертациялық жұмыста бес өсімдік түрінің <em class="font-display not-italic font-medium">морфологиялық ерекшеліктері</em>, <em class="font-display not-italic font-medium">систематикалық жағдайы</em> және <em class="font-display not-italic font-medium">таралу аймақтары</em> зерттелді.</p>
+      <p>Осы дипломдық жобада бес өсімдік түрінің <em class="font-display not-italic font-medium">морфологиялық ерекшеліктері</em>, <em class="font-display not-italic font-medium">систематикалық жағдайы</em> және <em class="font-display not-italic font-medium">таралу аймақтары</em> зерттелді.</p>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-px bg-ink/10 mt-12 rounded-2xl overflow-hidden">
         <div class="bg-paper p-6 reveal reveal-delay-1">
@@ -419,77 +483,167 @@
   </div>
 </section>
 
-<!-- ─── DISTRIBUTION ─── -->
-<section id="distribution" class="py-24 lg:py-36">
-  <div class="max-w-7xl mx-auto px-6 lg:px-10">
-    <div class="grid lg:grid-cols-12 gap-10 lg:gap-16">
-      <div class="lg:col-span-5 reveal lg:sticky lg:top-32 self-start">
+<!-- ─── DISTRIBUTION (MAP) ─── -->
+<section id="distribution" class="py-24 lg:py-36 relative overflow-hidden">
+  <!-- Decorative ornaments -->
+  <svg class="hidden lg:block absolute top-10 left-10 w-40 h-40 text-moss/10 a-floatY" viewBox="0 0 200 200" fill="currentColor"><path d="M100 10c40 30 60 70 60 120-50 0-90-40-90-90 0-10 10-20 30-30z"/></svg>
+  <svg class="hidden lg:block absolute bottom-10 right-10 w-32 h-32 text-clay/10 a-spin" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="1"><circle cx="100" cy="100" r="80"/><circle cx="100" cy="100" r="60"/><circle cx="100" cy="100" r="40"/></svg>
+
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 relative">
+    <!-- Header -->
+    <div class="grid lg:grid-cols-12 gap-10 mb-14 reveal">
+      <div class="lg:col-span-7">
         <div class="flex items-center gap-3 text-xs tracking-[0.3em] uppercase text-moss font-medium mb-6">
           <span class="w-10 h-px bg-moss"></span>
           Таралу аймақтары
         </div>
-        <h2 class="font-display font-light text-[clamp(32px,4vw,56px)] leading-tight text-ink">
-          Қызғалдақтың негізгі <em class="text-clay">таралу</em> орындары
+        <h2 class="font-display font-light text-[clamp(32px,4vw,60px)] leading-[1.05] text-ink">
+          Қазақстан өсімдіктерінің <em class="text-clay">интерактивті</em> картасы
         </h2>
-        <p class="mt-6 text-ink/65 leading-relaxed">
-          Қазақстанның оңтүстік-шығыс таулы аймақтары қызғалдақтардың табиғи орталығы болып табылады. Барбарис пен сирень туыстары әлемнің басқа аймақтарында кездеседі.
-        </p>
+      </div>
+      <p class="lg:col-span-5 self-end text-ink/60 leading-relaxed max-w-md">
+        Картадағы белгілердің үстінен өтіңіз немесе төмендегі тізімнен аймақты таңдаңыз — әр нүкте Қазақстан флорасының бірегей өкілдерін көрсетеді.
+      </p>
+    </div>
+
+    <div class="grid lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+
+      <!-- ─── MAP ─── -->
+      <div class="lg:col-span-8 reveal">
+        <div id="kzMap" class="relative aspect-[2/1] rounded-3xl bg-gradient-to-br from-cream via-paper to-sand/40 border border-ink/10 overflow-hidden shadow-cardlift">
+
+          <!-- Compass -->
+          <div class="absolute top-5 left-5 z-10 flex items-center gap-3">
+            <div class="relative w-12 h-12 rounded-full border border-ink/15 bg-paper/70 backdrop-blur flex items-center justify-center">
+              <span class="absolute -top-1 text-[9px] tracking-[0.3em] text-clay font-display italic">N</span>
+              <span class="w-0 h-0 border-x-[5px] border-x-transparent border-b-[14px] border-b-clay -mt-1"></span>
+            </div>
+            <div>
+              <div class="text-[10px] tracking-[0.25em] uppercase text-ink/50">Қазақстан</div>
+              <div class="font-display italic text-sm text-ink/80">Республикасы</div>
+            </div>
+          </div>
+
+          <!-- Scale -->
+          <div class="absolute bottom-5 left-5 z-10 flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase text-ink/50">
+            <div class="flex items-end gap-px">
+              <span class="w-8 h-2 bg-ink/40"></span>
+              <span class="w-8 h-2 bg-paper border border-ink/30"></span>
+            </div>
+            <span>500 км</span>
+          </div>
+
+          <!-- Latitude grid lines -->
+          <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 50" preserveAspectRatio="none">
+            <defs>
+              <pattern id="dots" x="0" y="0" width="2" height="2" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="0.18" fill="rgba(31,82,64,0.18)"/>
+              </pattern>
+              <linearGradient id="kzFill" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#1f5240" stop-opacity="0.08"/>
+                <stop offset="60%" stop-color="#c8975a" stop-opacity="0.10"/>
+                <stop offset="100%" stop-color="#7e2d3f" stop-opacity="0.08"/>
+              </linearGradient>
+            </defs>
+            <!-- meridians/parallels -->
+            <g stroke="rgba(14,27,21,0.06)" stroke-width="0.08">
+              <line x1="0" y1="12.5" x2="100" y2="12.5"/>
+              <line x1="0" y1="25"   x2="100" y2="25"/>
+              <line x1="0" y1="37.5" x2="100" y2="37.5"/>
+              <line x1="20" y1="0" x2="20" y2="50"/>
+              <line x1="40" y1="0" x2="40" y2="50"/>
+              <line x1="60" y1="0" x2="60" y2="50"/>
+              <line x1="80" y1="0" x2="80" y2="50"/>
+            </g>
+          </svg>
+
+          <!-- Kazakhstan SVG outline -->
+          <svg id="kzShape" class="absolute inset-0 w-full h-full" viewBox="0 0 100 50" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <linearGradient id="kzFillReal" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#1f5240" stop-opacity="0.10"/>
+                <stop offset="56%" stop-color="#c8975a" stop-opacity="0.13"/>
+                <stop offset="100%" stop-color="#7e2d3f" stop-opacity="0.09"/>
+              </linearGradient>
+              <pattern id="kzDotsReal" x="0" y="0" width="2" height="2" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="0.18" fill="rgba(31,82,64,0.18)"/>
+              </pattern>
+              <path id="kzBoundaryPath" d="M 90.09 23.41 L 89.68 23.27 L 89.4 23.39 L 89.18 23.35 L 88.95 23.64 L 88.88 23.8 L 88.9 23.92 L 89.04 24.14 L 88.94 24.31 L 88.96 24.51 L 88.68 24.88 L 88.6 25.07 L 88.33 25.19 L 88.09 25.2 L 87.87 25.39 L 87.5 25.36 L 87.06 25.42 L 86.94 25.57 L 86.68 26.21 L 86.54 26.86 L 86.69 27.72 L 86.67 28.1 L 86.84 28.42 L 86.86 28.74 L 86.82 28.93 L 86.62 29.01 L 86.5 29.38 L 85.97 29.41 L 85.62 29.76 L 85.48 29.81 L 85.36 29.96 L 85.01 30.06 L 84.97 30 L 85.04 29.77 L 84.86 29.58 L 84.59 29.62 L 84.39 29.55 L 84.08 29.53 L 83.87 29.55 L 83.7 29.63 L 83.38 29.6 L 82.63 29.34 L 82.29 29.11 L 82.04 29.03 L 81.89 28.92 L 81.74 28.9 L 81.64 28.94 L 81.57 29.7 L 81.28 30.3 L 80.96 31.44 L 80.75 31.83 L 80.6 32.66 L 80.37 33.13 L 80.21 33.69 L 80.35 33.84 L 80.64 33.88 L 80.85 33.97 L 80.88 34.02 L 80.84 34.49 L 80.7 34.84 L 80.57 34.86 L 80.31 34.61 L 80.12 34.54 L 79.54 34.78 L 79.39 34.68 L 79.23 34.64 L 79.18 34.33 L 79.13 34.24 L 78.98 34.21 L 78.74 34.37 L 77.39 34.83 L 77.08 34.78 L 76.76 34.9 L 76.59 34.89 L 76.48 35.05 L 76.28 35.05 L 76.14 35.11 L 75.91 35.09 L 75.43 35.45 L 75.4 35.53 L 75.45 35.6 L 75.69 35.75 L 76.19 35.69 L 76.68 35.94 L 76.68 36.01 L 76.41 36.14 L 76.46 36.28 L 76.36 36.69 L 76.44 37.3 L 76.38 37.6 L 76.5 37.8 L 76.54 38.01 L 76.65 38.18 L 77.11 39.4 L 76.97 39.76 L 77.18 39.9 L 77.27 40.24 L 77.23 40.34 L 77.15 40.37 L 76.93 40.28 L 76.43 40.56 L 76.41 40.64 L 76.44 40.71 L 76.78 40.86 L 76.79 40.97 L 76.37 41.13 L 76.23 41.11 L 76.16 41.2 L 75.99 41.65 L 76.12 42 L 76.1 42.15 L 76.24 42.67 L 76.2 42.76 L 76.12 42.8 L 76.04 42.75 L 75.86 42.49 L 75.55 42.18 L 75.12 42.08 L 74.87 42.11 L 74.58 42.06 L 74.44 41.77 L 74.15 41.56 L 74.09 41.41 L 74.1 41.24 L 74.04 41.2 L 73.73 41.29 L 73.13 41.16 L 72.95 41.04 L 72.63 40.96 L 72.4 41.04 L 72.24 41 L 71.85 41.03 L 71.56 40.93 L 71.41 40.99 L 71.36 40.92 L 71.22 40.89 L 70.92 40.94 L 70.81 40.87 L 70.64 40.85 L 70.47 40.91 L 70.17 40.87 L 70.07 40.75 L 69.74 40.67 L 69.5 40.72 L 69.25 40.87 L 69.01 40.92 L 68.8 40.86 L 68.67 40.95 L 68.61 40.88 L 68.53 40.9 L 68.36 40.85 L 67.99 40.82 L 67.86 40.86 L 67.46 40.81 L 67.28 41.09 L 67.11 41.16 L 66.99 41.11 L 66.25 41.04 L 65.63 40.7 L 65.34 40.64 L 65.13 40.48 L 65.03 40.33 L 64.72 40.21 L 64.28 39.94 L 64.36 40.06 L 64.32 40.11 L 64.01 40.15 L 63.87 40.06 L 63.81 40.1 L 63.74 40.29 L 63.55 40.33 L 63.09 40.55 L 62.94 40.92 L 62.96 41.19 L 62.78 41.64 L 62.79 41.83 L 62.96 42.23 L 62.61 42.17 L 62.59 41.99 L 62.52 41.94 L 62.34 41.92 L 62.2 41.84 L 61.73 41.86 L 61.43 41.57 L 60.94 41.49 L 60.58 41.28 L 60.33 41.27 L 60.21 41.31 L 59.71 41.08 L 59.41 41.14 L 59.19 41.28 L 59.04 41.2 L 58.84 41.19 L 58.69 41.34 L 58.53 41.32 L 58.46 41.43 L 58.34 41.5 L 58.33 41.7 L 58.05 41.81 L 58.17 42.06 L 58.13 42.1 L 58 42.03 L 57.97 42.06 L 57.91 42.31 L 57.76 42.49 L 57.85 42.61 L 57.94 42.65 L 57.74 42.79 L 57.52 42.78 L 57.28 43.23 L 57.13 43.24 L 56.98 43.05 L 56.79 43.14 L 56.61 43.39 L 56.48 43.47 L 56.3 43.76 L 56.03 43.92 L 55.91 44.06 L 55.35 44.18 L 55.06 44.43 L 54.89 44.5 L 54.87 44.57 L 54.91 44.68 L 54.55 44.72 L 54.37 44.89 L 54.19 44.95 L 54.23 45.1 L 54.18 45.38 L 54.01 45.49 L 53.88 45.52 L 53.81 45.64 L 53.62 45.76 L 53.51 46.01 L 53.34 46.1 L 53.31 46.17 L 53.28 46.15 L 53.24 46.35 L 53.26 46.57 L 53.28 46.64 L 53.35 46.66 L 53.39 46.79 L 53.34 46.88 L 53.36 46.94 L 53.32 46.96 L 53.17 46.91 L 53.06 47 L 52.6 46.76 L 52.29 46.47 L 52.14 46.41 L 52.32 46.25 L 52.39 46.01 L 52.35 45.89 L 52.41 45.85 L 52.39 45.75 L 52.32 45.81 L 52.27 45.78 L 52.22 45.81 L 52.03 45.4 L 51.83 45.51 L 51.66 45.44 L 49.83 45.55 L 49.67 45.51 L 49.58 45.4 L 49.41 44.63 L 49.22 43.32 L 48.25 43.3 L 48.26 42.23 L 48.34 42.13 L 48.43 40.67 L 47.83 40.97 L 47.28 39.84 L 46.8 39.52 L 46.12 38.7 L 45.98 38.72 L 45.14 39.17 L 42.75 38.95 L 40.43 39.34 L 40.35 39.31 L 38.73 37.47 L 38.62 37.29 L 38.57 37.02 L 38.49 36.89 L 33.62 33.63 L 31.5 34.24 L 28.56 35.2 L 28.56 45.08 L 28.36 45.08 L 27.89 45.23 L 27.64 45.25 L 27.52 45.2 L 27.37 44.94 L 27.09 44.69 L 26.84 44.24 L 26.54 43.84 L 26.52 43.59 L 26.46 43.48 L 26.13 43.17 L 25.06 42.46 L 24.92 42.41 L 24.77 42.39 L 23.52 42.62 L 22.67 42.97 L 22.25 43.32 L 21.61 43.96 L 21.72 43.56 L 21.68 43.4 L 21.6 43.3 L 21.61 43.15 L 21.54 43.06 L 21.61 42.83 L 21.7 42.77 L 21.92 42.41 L 22.08 41.87 L 22.05 41.68 L 21.97 41.5 L 21.88 41.45 L 21.86 41.33 L 21.93 41.45 L 22.05 41.53 L 22.15 41.75 L 22.21 41.61 L 22.2 41.44 L 22.15 41.36 L 21.99 41.31 L 21.98 41.24 L 21.68 41.11 L 21.45 41.09 L 21.34 41.2 L 21.29 41.18 L 21.08 40.94 L 20.58 41.06 L 20.36 40.75 L 20.3 40.56 L 20.19 40.4 L 20.12 40.37 L 20.12 40.21 L 20.07 40.13 L 19.85 40.17 L 19.79 40.22 L 19.69 40.19 L 19.33 40.22 L 19.31 40.14 L 19.4 39.8 L 19.41 39.39 L 19.32 39.13 L 19.22 39.04 L 19.19 38.96 L 19.1 38.95 L 19.01 38.86 L 18.83 38.48 L 18.77 38.18 L 18.6 37.9 L 18.52 37.86 L 18.49 37.42 L 18.36 37.29 L 18.19 37.21 L 17.5 37.08 L 17.37 37.01 L 17.28 36.86 L 17.27 36.38 L 17.29 36.33 L 17.32 36.41 L 17.35 36.37 L 17.44 36.12 L 17.8 36.22 L 18.04 36.18 L 18.06 36.22 L 18.26 36.23 L 18.31 36.27 L 18.37 36.2 L 18.54 36.21 L 18.71 36.37 L 18.8 36.38 L 18.8 36.48 L 19.07 36.61 L 19.23 36.56 L 19.36 36.42 L 19.51 36.4 L 19.52 36.49 L 19.71 36.48 L 19.89 36.53 L 19.92 36.5 L 19.88 36.42 L 19.65 36.26 L 19.42 36.3 L 19.25 35.96 L 18.98 35.74 L 18.89 35.73 L 18.72 35.56 L 18.78 35.36 L 18.7 35.31 L 18.71 35.24 L 18.92 35.19 L 19.17 35 L 19.32 35.11 L 19.27 34.73 L 19.4 34.47 L 19.57 34.26 L 19.6 34.1 L 19.69 34.21 L 19.86 34.25 L 20.16 34.09 L 20.28 33.91 L 20.34 34.05 L 20.51 34.08 L 20.63 34.16 L 20.77 34.08 L 20.94 34.12 L 21.77 34.04 L 22.54 34.31 L 22.72 34.29 L 22.93 34.35 L 23.23 34.23 L 23.2 34.15 L 23 34.11 L 22.23 33.74 L 22.19 33.64 L 22.22 33.4 L 22.31 33.33 L 22.44 33.04 L 22.56 32.96 L 22.79 32.56 L 22.95 32.06 L 23.02 31.41 L 22.97 31.26 L 22.78 31.05 L 22.91 31.12 L 22.86 31.03 L 22.87 30.93 L 22.75 31.02 L 22.71 30.95 L 22.79 30.75 L 22.82 30.83 L 22.89 30.81 L 22.93 30.61 L 22.95 30.67 L 22.99 30.58 L 23.11 30.55 L 23.12 30.4 L 23.08 30.34 L 22.92 30.28 L 22.83 29.84 L 22.7 29.83 L 22.56 29.65 L 21.96 29.67 L 21.81 29.56 L 21.65 29.53 L 21.59 29.56 L 21.57 29.69 L 21.45 29.84 L 21.27 29.9 L 21.12 29.86 L 21.11 29.93 L 21.19 29.97 L 21.23 30.08 L 20.97 30.07 L 20.75 29.84 L 20.79 29.71 L 20.75 29.7 L 20.64 29.87 L 20.46 29.83 L 20.55 29.73 L 20.37 29.79 L 20.25 29.74 L 20.12 29.59 L 20.16 29.47 L 20.12 29.37 L 20.04 29.39 L 19.99 29.56 L 19.95 29.57 L 19.82 29.38 L 19.21 29.18 L 18.99 29.3 L 18.73 29.36 L 18.6 29.48 L 18.49 29.42 L 18.28 29.8 L 18.3 29.6 L 18.16 29.72 L 18.04 29.71 L 18.02 29.91 L 17.94 30.02 L 17.91 30 L 17.96 29.88 L 17.81 29.92 L 17.67 29.83 L 17.58 30.05 L 17.55 30.09 L 17.56 29.95 L 17.28 30.32 L 17.24 30.31 L 17.24 30.2 L 17.16 30.25 L 16.89 30.58 L 16.75 30.59 L 16.6 30.75 L 16.51 30.73 L 16.47 30.85 L 16.38 30.77 L 16.35 30.87 L 16.24 30.79 L 16.24 30.91 L 16.09 30.73 L 16.09 30.91 L 16.06 30.89 L 16 30.97 L 15.96 30.86 L 15.81 30.79 L 15.78 30.69 L 15.83 30.96 L 15.76 30.93 L 15.77 30.87 L 15.71 30.81 L 15.69 30.85 L 15.63 30.84 L 15.46 30.71 L 15.64 31.02 L 15.52 31.01 L 15.45 30.89 L 15.41 30.91 L 15.46 31.06 L 15.58 31.16 L 15.59 31.25 L 15.58 31.28 L 15.5 31.22 L 15.39 31.06 L 15.3 31.05 L 15.44 31.26 L 15.19 31.22 L 15.29 31.3 L 15.31 31.45 L 14.93 31.23 L 14.66 31.01 L 14.51 31.02 L 14.28 30.82 L 13.96 30.77 L 14.01 30.7 L 13.94 30.57 L 13.79 30.5 L 13.89 30.3 L 13.99 30.21 L 14.11 30.19 L 14.23 30.22 L 14.4 30.44 L 14.7 30.38 L 14.88 30.19 L 14.27 29.24 L 13.93 28.34 L 13.71 28.24 L 13.24 27.46 L 12.99 27.3 L 12.21 27.31 L 11.75 27.1 L 11.64 27.55 L 11.18 27.19 L 11.25 27 L 11.02 26.66 L 11.31 26.41 L 11.14 26.33 L 11.17 26.17 L 11.09 26.02 L 11.16 25.91 L 11.13 25.84 L 9.91 25.41 L 10.45 23.92 L 10.8 23.65 L 10.98 23.37 L 10.99 23.06 L 10.9 22.93 L 10.5 22.66 L 10.79 21.06 L 11.29 20.8 L 11.58 20.42 L 11.58 20.31 L 11.46 20.07 L 11.57 19.91 L 11.52 19.8 L 11.54 19.74 L 11.71 19.65 L 11.94 19.3 L 12.11 19.25 L 12.89 20.08 L 12.92 20.2 L 13.09 20.4 L 13.18 20.75 L 13.29 20.87 L 13.37 21.05 L 13.49 21.05 L 13.74 21.22 L 13.84 21.12 L 14.44 20.84 L 14.64 20.58 L 14.62 20.43 L 14.57 20.34 L 14.44 20.3 L 14.45 20.11 L 14.28 19.61 L 14.22 18.86 L 14.17 18.79 L 14.02 18.74 L 14.02 18.68 L 14.1 18.65 L 14.35 18.8 L 14.53 18.81 L 14.89 18.54 L 15.15 18.23 L 15.59 18.09 L 15.69 17.92 L 15.54 17.66 L 15.72 17.2 L 16.39 17.23 L 16.8 16.83 L 17.23 16.72 L 17.46 16.6 L 17.51 16.54 L 17.49 16.39 L 17.56 16.31 L 17.53 16.26 L 17.72 16.22 L 17.77 16.13 L 17.86 16.08 L 17.86 15.78 L 17.96 15.71 L 17.97 15.56 L 18.19 15.63 L 18.12 15.74 L 18.14 15.77 L 18.24 15.77 L 18.38 15.68 L 18.29 15.32 L 18.29 15.22 L 18.33 15.17 L 18.47 15.21 L 18.64 15.42 L 19.12 15.45 L 19.25 15.4 L 19.35 15.53 L 19.52 15.58 L 19.54 15.71 L 19.49 15.79 L 19.25 15.87 L 19.39 16.07 L 19.7 16.06 L 19.94 15.88 L 20.01 15.93 L 20.06 16.14 L 20.15 16.13 L 20.32 16.01 L 20.29 15.69 L 20.49 15.44 L 20.6 15.42 L 20.82 15.5 L 20.93 15.48 L 21.04 15.3 L 21.26 15.28 L 21.36 15.12 L 21.41 15.15 L 21.69 15.97 L 21.82 16.11 L 22.06 16.13 L 22.28 15.96 L 22.36 16.03 L 22.51 16.03 L 22.48 16.09 L 22.61 16.13 L 22.79 16.02 L 23.02 16.03 L 23.04 15.94 L 23.13 16 L 23.39 15.98 L 23.51 16.04 L 23.6 16.17 L 23.91 16.34 L 23.93 16.39 L 23.84 16.45 L 23.88 16.65 L 24.04 16.87 L 24.4 16.98 L 24.55 16.97 L 24.71 17.18 L 24.9 17.25 L 24.96 17.58 L 25.22 17.85 L 25.62 18.01 L 25.63 18.1 L 25.51 18.27 L 25.42 18.74 L 25.53 18.96 L 25.66 19.03 L 25.84 18.97 L 26 18.79 L 25.93 18.46 L 25.93 17.91 L 25.66 17.78 L 25.75 17.7 L 25.73 17.54 L 25.93 17.47 L 26.02 17.48 L 26.27 17.64 L 26.43 17.83 L 26.73 17.91 L 26.81 18.19 L 27.24 18.59 L 27.32 18.64 L 27.56 18.62 L 27.67 18.79 L 27.94 19.01 L 28.76 18.41 L 28.91 17.85 L 29.22 17.92 L 29.29 17.72 L 29.45 17.63 L 29.43 17.45 L 29.54 17.33 L 29.6 17.35 L 29.77 17.6 L 29.95 17.65 L 30 17.61 L 29.94 17.4 L 30.01 17.33 L 30.09 17.3 L 30.3 17.39 L 30.45 17.34 L 30.71 17.34 L 30.87 17.24 L 30.95 17.5 L 31.1 17.56 L 31.22 17.87 L 31.48 17.99 L 31.66 17.81 L 31.92 17.88 L 31.98 17.84 L 32.01 17.32 L 32.07 17.18 L 32.36 17.23 L 32.45 17.31 L 32.68 17.25 L 32.75 17.35 L 32.86 17.38 L 32.97 17.17 L 33.13 17.08 L 33.25 17.21 L 33.27 17.33 L 33.55 17.36 L 33.7 17.48 L 33.7 17.67 L 33.62 17.79 L 33.61 17.89 L 33.65 17.98 L 33.79 17.98 L 33.83 18.21 L 34 18.19 L 34.12 18.41 L 34.35 18.55 L 34.88 18.6 L 35.03 18.75 L 35.35 18.7 L 35.6 18.86 L 35.59 18.94 L 35.43 18.94 L 35.38 18.99 L 35.41 19.08 L 35.52 19.18 L 35.71 19.03 L 36.01 19 L 36.09 18.91 L 36.29 18.57 L 36.29 18.34 L 36.38 18.08 L 36.5 18.01 L 36.72 18.04 L 36.8 18.36 L 37.04 18.53 L 37.86 18.63 L 39.15 18.23 L 39.26 18.07 L 39.47 16.91 L 39.53 16.82 L 39.72 16.75 L 39.52 16.63 L 39.35 16.22 L 39.12 16.11 L 39.02 16.13 L 38.87 16.08 L 38.47 16.04 L 38.31 15.85 L 38.29 15.63 L 37.47 15.61 L 37.41 15.51 L 37.19 15.47 L 37.15 15.38 L 37.31 15.26 L 37.32 15.18 L 37.39 15.11 L 37.34 15.02 L 36.99 14.93 L 36.73 14.75 L 36.69 14.83 L 36.57 14.85 L 36.43 14.55 L 36.46 14.42 L 36.85 14.42 L 37.29 13.99 L 37.45 13.92 L 37.77 13.94 L 37.99 13.69 L 38.21 13.59 L 38.5 13.33 L 38.34 13.11 L 38.29 12.83 L 38.05 12.73 L 38.03 12.38 L 37.88 12.39 L 37.77 12.24 L 37.82 12.04 L 38.08 11.92 L 38.19 11.74 L 38.53 11.43 L 38.37 11.27 L 38.59 11.25 L 38.79 11.13 L 38.98 11.22 L 39.1 11.22 L 39.3 11.11 L 39.61 11.34 L 39.74 11.26 L 40.03 11.25 L 40.3 11.39 L 40.45 11.33 L 40.56 11.2 L 40.61 10.96 L 40.54 10.81 L 40.48 10.77 L 39.92 10.62 L 39.68 10.38 L 39.43 10.49 L 39.16 10.32 L 38.82 10.27 L 38.74 10.2 L 38.69 9.95 L 38.88 9.53 L 38.98 9.52 L 39.11 9.7 L 39.23 9.75 L 39.51 9.52 L 39.4 9.24 L 39.13 9.26 L 39.04 9.39 L 38.97 9.4 L 38.69 9.33 L 38.61 9.21 L 38.24 9.16 L 38.18 9.1 L 38.23 9.02 L 38.43 9.09 L 38.5 9.03 L 38.52 8.86 L 38.63 8.83 L 38.81 8.55 L 38.81 8.48 L 38.58 8.29 L 38.37 8.27 L 38.36 8.16 L 38.41 8.07 L 38.54 8.02 L 38.7 8.04 L 38.76 8.15 L 38.83 8.18 L 38.87 8.07 L 38.8 7.81 L 38.91 7.81 L 39.08 7.66 L 39.24 7.69 L 39.36 7.87 L 39.5 7.9 L 39.51 8.01 L 39.56 8.05 L 39.62 8.01 L 39.63 7.9 L 39.87 7.94 L 39.97 7.87 L 40.03 7.9 L 40.1 8.07 L 40.39 8.1 L 40.39 7.82 L 41.19 7.79 L 41.26 7.83 L 41.25 7.9 L 41.16 7.96 L 41.15 8.07 L 41.41 8.3 L 41.45 8.26 L 41.42 8.11 L 41.53 7.98 L 41.46 7.79 L 41.61 7.64 L 41.97 7.56 L 42.15 7.61 L 42.31 7.57 L 42.51 7.59 L 42.59 7.51 L 42.59 7.29 L 43.07 7.33 L 43.28 7.19 L 43.41 7.18 L 43.73 7.04 L 44.1 7.23 L 44.32 7.11 L 44.36 7.02 L 44.26 6.88 L 44.31 6.8 L 44.42 6.86 L 44.49 6.79 L 44.65 6.8 L 44.88 6.69 L 45.15 6.7 L 45.22 6.63 L 45.31 6.65 L 45.44 6.58 L 45.59 6.71 L 45.72 6.76 L 46.09 6.52 L 46.22 6.58 L 46.44 6.84 L 46.63 6.83 L 46.69 6.73 L 46.62 6.37 L 46.66 6.14 L 46.94 5.99 L 47.15 6 L 47.15 5.76 L 47.4 5.77 L 47.73 5.85 L 47.89 5.61 L 48.1 5.51 L 48.19 5.82 L 49.11 5.48 L 49.61 5.45 L 49.77 5.32 L 50.15 5.3 L 50.39 5.21 L 50.61 5.19 L 50.81 4.97 L 50.94 5.01 L 51.42 4.99 L 51.57 4.95 L 51.8 4.66 L 51.93 4.6 L 52.18 4.69 L 52.48 4.65 L 52.62 4.36 L 52.75 4.32 L 52.76 4.25 L 52.53 4.07 L 52.56 3.97 L 52.5 3.91 L 52.67 3.83 L 52.76 3.87 L 52.9 3.83 L 53.09 3.87 L 53.35 3.82 L 53.36 3.66 L 53.48 3.56 L 53.53 3.26 L 53.82 3.34 L 53.97 3.55 L 54.06 3.54 L 54.08 3.3 L 53.96 3.22 L 53.93 3.08 L 54.01 3 L 54.36 3.13 L 54.49 3.38 L 54.78 3.17 L 55.06 3.29 L 55.44 3.35 L 55.69 3.49 L 55.97 3.81 L 56.2 3.85 L 56.5 4.04 L 56.64 3.87 L 56.83 3.79 L 56.95 3.52 L 57.18 3.57 L 57.39 3.43 L 57.5 3.42 L 57.69 3.48 L 57.63 3.58 L 57.64 3.69 L 58 4.23 L 57.96 4.59 L 58 4.68 L 57.94 4.88 L 58.03 5.01 L 58.06 5.27 L 58.24 5.41 L 58.44 5.44 L 58.57 5.65 L 58.54 5.77 L 58.34 5.89 L 58.32 5.98 L 58.37 6.48 L 58.43 6.53 L 58.42 6.81 L 58.27 6.83 L 58.05 6.76 L 57.99 6.85 L 58 6.97 L 58.15 6.99 L 58.13 7.25 L 58.24 7.32 L 58.36 7.53 L 58.47 7.49 L 58.67 7.2 L 58.94 7.27 L 58.98 7.51 L 59.17 7.44 L 59.32 7.51 L 59.44 7.43 L 59.45 7.17 L 59.54 7.05 L 59.98 7.1 L 60.2 7.43 L 60.31 7.45 L 60.38 7.37 L 60.38 7.28 L 60.34 7.22 L 60.14 7.13 L 60.21 6.83 L 60.06 6.68 L 60.09 6.61 L 60.37 6.68 L 60.56 7 L 60.65 7.03 L 60.66 7.13 L 60.59 7.28 L 60.96 7.42 L 60.92 7.51 L 60.84 7.51 L 60.81 7.58 L 60.71 7.56 L 60.72 7.68 L 60.83 7.82 L 60.74 8.09 L 60.78 8.18 L 60.94 8.16 L 61.1 7.95 L 61.33 8.04 L 61.38 8.02 L 61.3 7.73 L 61.25 7.7 L 61 7.71 L 61.04 7.54 L 61.13 7.45 L 61.23 7.42 L 61.86 7.47 L 61.91 7.53 L 61.93 7.72 L 62.02 7.76 L 62.09 7.95 L 62.68 8.08 L 62.74 7.96 L 62.92 8.06 L 62.99 8.02 L 63.01 7.84 L 63.16 7.76 L 63.15 7.64 L 63.29 7.62 L 63.32 7.71 L 63.43 7.68 L 63.31 8.3 L 63.22 8.35 L 62.92 8.29 L 62.82 8.32 L 62.74 8.45 L 62.83 8.51 L 62.65 8.58 L 62.57 8.92 L 62.42 9 L 62.41 9.11 L 62.48 9.18 L 62.42 9.3 L 62.74 9.47 L 62.65 9.67 L 62.78 9.77 L 63.04 9.51 L 63.11 9.34 L 63.23 9.33 L 63.25 9.17 L 63.42 9.17 L 63.52 9.22 L 63.75 9.08 L 64.05 9.12 L 64.08 9.32 L 64.17 9.31 L 64.22 9.21 L 64.37 9.22 L 64.46 9.36 L 64.46 9.49 L 64.7 9.66 L 64.83 9.3 L 64.76 9.19 L 64.79 8.96 L 64.82 8.92 L 65.14 8.94 L 65.22 8.71 L 65.38 8.66 L 65.45 8.44 L 65.68 8.42 L 65.95 8.52 L 66.75 7.92 L 66.6 7.68 L 66.74 7.57 L 66.88 7.53 L 67.15 7.54 L 68.22 7.03 L 68.21 6.85 L 68.32 6.71 L 68.71 6.81 L 68.8 6.79 L 68.96 6.68 L 69.08 6.68 L 69.18 6.41 L 69.39 6.4 L 69.62 6.32 L 69.63 6.42 L 69.44 6.5 L 69.34 6.61 L 69.5 6.72 L 69.5 6.88 L 69.36 7.2 L 69.16 7.43 L 68.8 7.33 L 68.6 7.36 L 68.8 7.74 L 68.83 7.9 L 68.89 8 L 71.03 9.72 L 71.52 10.28 L 72.72 12.35 L 73.83 14.42 L 74.67 16.01 L 75.65 18.14 L 75.75 18.28 L 75.88 18.32 L 75.74 18.05 L 75.81 18.01 L 75.99 18.12 L 76.07 17.94 L 76.24 17.82 L 76.42 17.81 L 76.57 17.68 L 76.62 17.42 L 76.52 17.23 L 76.54 16.97 L 76.6 16.9 L 76.89 16.9 L 76.95 16.68 L 77.05 16.61 L 77.36 16.75 L 77.49 16.67 L 77.53 16.88 L 77.72 17 L 77.81 17.02 L 77.9 16.94 L 77.97 16.97 L 77.96 17.13 L 77.78 17.69 L 77.88 17.75 L 78.22 17.67 L 78.46 17.68 L 78.49 17.9 L 78.59 18.07 L 78.5 18.29 L 78.58 18.39 L 79 18.37 L 79.13 18.22 L 79.29 18.28 L 79.53 18.27 L 79.93 18.48 L 80.03 18.46 L 80.14 18.35 L 80.2 18.37 L 80.28 18.32 L 80.44 18.34 L 80.57 18.44 L 80.96 18.21 L 81.01 18.14 L 81.01 17.92 L 81.06 17.86 L 81.55 17.92 L 81.71 17.81 L 81.81 17.58 L 82.24 17.55 L 82.45 17.58 L 82.58 17.72 L 82.8 17.77 L 83 17.92 L 83.21 17.96 L 83.47 18.24 L 83.46 18.43 L 83.52 18.53 L 83.76 18.71 L 83.95 19.07 L 83.91 19.29 L 84.03 19.58 L 84.05 19.84 L 84.16 19.89 L 84.21 19.99 L 84.29 19.99 L 84.43 19.89 L 84.61 20.06 L 84.82 20.07 L 84.98 20.22 L 85.11 20.23 L 85.21 20.39 L 85.35 20.35 L 85.5 20.43 L 85.58 20.63 L 85.44 20.67 L 85.44 20.92 L 85.64 21.03 L 85.69 21.25 L 85.89 21.54 L 85.91 21.78 L 85.96 21.87 L 86.04 21.91 L 86.28 21.81 L 86.46 21.91 L 86.73 21.8 L 86.85 21.98 L 86.99 21.94 L 87.11 22.05 L 87.25 21.97 L 87.37 21.98 L 87.38 22.21 L 87.63 22.08 L 87.71 22.1 L 87.84 22.27 L 88.02 21.91 L 88.42 21.64 L 88.42 21.53 L 88.6 21.42 L 88.69 21.26 L 88.83 21.32 L 88.96 21.3 L 88.94 21.48 L 89.01 21.57 L 88.76 21.69 L 88.66 21.85 L 88.66 21.94 L 88.75 22.01 L 88.93 22.01 L 89.11 22.13 L 89.12 22.36 L 89.32 22.49 L 89.28 22.65 L 89.48 22.82 L 89.52 22.93 L 89.82 22.95 L 89.98 23.05 L 90.09 23.41 Z M 43.1 33.6 L 43.54 33.51 L 43.91 33.26 L 44.15 32.9 L 44.24 32.44 L 44.15 31.99 L 43.91 31.62 L 43.54 31.37 L 43.1 31.27 L 42.65 31.37 L 42.29 31.62 L 42.04 31.99 L 41.95 32.44 L 42.04 32.9 L 42.29 33.26 L 42.65 33.51 L 43.1 33.6 Z M 17.34 35.15 L 17.37 34.98 L 17.51 34.95 L 17.48 35.2 L 17.42 35.29 L 17.34 35.28 L 17.34 35.15 Z M 17.16 35.65 L 17.11 35.69 L 16.98 35.64 L 16.8 35.33 L 16.91 35.02 L 17.05 34.96 L 17.05 35.01 L 16.93 35.07 L 16.87 35.34 L 16.94 35.38 L 16.97 35.57 L 17.1 35.62 L 17.2 35.57 L 17.16 35.65 Z M 18.29 35.5 L 18.32 35.56 L 18.2 35.58 L 18.17 35.43 L 18.08 35.37 L 18.06 35.27 L 18.16 35.36 L 18.23 35.31 L 18.29 35.5 Z M 22.11 33.9 L 22.13 34.05 L 22.08 34.08 L 21.91 33.98 L 21.84 33.85 L 21.93 33.71 L 22 33.72 L 22.07 33.78 L 22.11 33.9 Z M 16.48 31.49 L 16.51 31.64 L 16.44 31.79 L 16.28 31.37 L 16.34 31.37 L 16.48 31.49 Z"/>
+              <clipPath id="kzClip">
+                <use href="#kzBoundaryPath"/>
+              </clipPath>
+            </defs>
+
+            <use href="#kzBoundaryPath" fill="url(#kzFillReal)" stroke="#1f5240" stroke-width="0.32" stroke-linejoin="round" stroke-dasharray="0.55 0.35" opacity="0.9" fill-rule="evenodd" clip-rule="evenodd"/>
+            <use href="#kzBoundaryPath" fill="url(#kzDotsReal)" opacity="0.9" fill-rule="evenodd" clip-rule="evenodd"/>
+
+            <!-- Internal administrative hint lines (subtle) -->
+            <g clip-path="url(#kzClip)" stroke="rgba(14,27,21,0.10)" stroke-width="0.12" fill="none" stroke-dasharray="0.4 0.5">
+              <path d="M 28 17 Q 34 26 31 43"/>
+              <path d="M 52 5 Q 49 22 54 44"/>
+              <path d="M 72 10 Q 68 26 77 42"/>
+              <path d="M 12 25 Q 42 28 88 26"/>
+            </g>
+
+            <!-- Mountains hint (south-east) -->
+            <g clip-path="url(#kzClip)" stroke="#1f5240" stroke-width="0.25" fill="none" opacity="0.5">
+              <path d="M 62 41 l 1.4 -1.8 l 1.1 1.6 l 1.7 -2.3 l 1.3 1.9 l 1.6 -1.5 l 1.3 1.3 l 1.5 -1.8 l 1.3 1.4"/>
+              <path d="M 72 42 l 1.7 -2.2 l 1.3 1.9 l 1.5 -2.4 l 1.3 1.9 l 1.5 -1.5"/>
+              <path d="M 80 36 l 1.4 -1.7 l 1.1 1.3 l 1.5 -1.9 l 1.1 1.5"/>
+            </g>
+
+            <!-- Water bodies -->
+            <path d="M 0 17 L 10.2 17 Q 11.4 22.8 10 27.7 Q 8.4 33.5 13 38.6 Q 15.6 41.2 17 43 L 0 45 Z" fill="#5d8fa0" opacity="0.22"/>
+            <path d="M 10.2 17 Q 11.4 22.8 10 27.7 Q 8.4 33.5 13 38.6 Q 15.6 41.2 17 43" stroke="#5d8fa0" stroke-width="0.25" fill="none" opacity="0.55" stroke-dasharray="0.4 0.4"/>
+            <ellipse cx="38.1" cy="35.2" rx="2.4" ry="1.2" fill="#5d8fa0" opacity="0.4"/>
+            <path d="M 64.8 30.5 q 4 -1.1 8.7 -0.2 q 3.4 0.8 6.1 2.5 q -3.4 1.1 -7.9 0.4 q -4.2 -0.5 -6.9 -2.7 Z" fill="#5d8fa0" opacity="0.4"/>
+            <text x="1" y="32" font-size="1.6" fill="#5d8fa0" opacity="0.75" font-style="italic" font-family="Fraunces,serif">Каспий</text>
+            <text x="35.3" y="34" font-size="1.1" fill="#3d6e80" opacity="0.85" font-style="italic" font-family="Fraunces,serif">Арал</text>
+            <text x="66" y="29.6" font-size="1.1" fill="#3d6e80" opacity="0.85" font-style="italic" font-family="Fraunces,serif">Балқаш</text>
+
+            <!-- Region labels -->
+            <g font-family="Inter,sans-serif" font-size="1.3" fill="rgba(14,27,21,0.38)" letter-spacing="0.15">
+              <text x="42" y="21">САРЫАРҚА</text>
+              <text x="18" y="27">ҮСТІРТ</text>
+              <text x="72" y="21">ШЫҒЫС</text>
+              <text x="47" y="39">ОҢТҮСТІК</text>
+            </g>
+
+            <!-- Capital marker (Астана) -->
+            <g>
+              <circle cx="58.9" cy="17.15" r="0.6" fill="#7e2d3f"/>
+              <circle cx="58.9" cy="17.15" r="1.4" fill="none" stroke="#7e2d3f" stroke-width="0.2" opacity="0.6"/>
+              <text x="60.6" y="17.9" font-size="1.5" fill="#0e1b15" font-family="Fraunces,serif" font-style="italic">Астана</text>
+            </g>
+          </svg>
+
+          <!-- Markers (positioned absolutely via %) -->
+          <div id="markers" class="absolute inset-0"></div>
+
+        </div>
+
+        <!-- Hover info panel -->
+        <div id="mapInfo" class="mt-4 grid sm:grid-cols-[180px_1fr] gap-4 items-center bg-paper/95 backdrop-blur-md rounded-2xl border border-ink/10 p-4 shadow-soft opacity-0 translate-y-2 transition-all duration-500">
+          <div class="aspect-[4/3] sm:aspect-[16/11] rounded-xl overflow-hidden bg-ink/5">
+            <img id="mapInfoImg" src="" alt="" class="w-full h-full object-cover">
+          </div>
+          <div>
+            <div class="text-[10px] tracking-[0.3em] uppercase text-clay font-medium mb-1" id="mapInfoLat"></div>
+            <div class="font-display text-xl text-ink leading-tight" id="mapInfoName"></div>
+            <div class="text-xs text-ink/60 mt-2 leading-relaxed" id="mapInfoDesc"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── REGION LIST ─── -->
+      <div class="lg:col-span-4 reveal reveal-delay-2">
+        <div class="text-[10px] tracking-[0.3em] uppercase text-moss font-medium mb-5">Аймақтар тізімі</div>
+        <ol id="regionList" class="border-y border-ink/10"></ol>
         <a href="#taxonomy" data-cursor="hover" class="mt-8 inline-flex items-center gap-3 text-sm tracking-wide text-ink hover:text-clay transition group">
           Жүйелеу кестесіне өту
           <span class="w-10 h-px bg-ink group-hover:bg-clay group-hover:w-16 transition-all duration-500"></span>
         </a>
       </div>
-
-      <ol class="lg:col-span-7 reveal border-y border-ink/10">
-        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
-          <span class="col-span-1 font-display italic text-clay text-lg">01</span>
-          <span class="col-span-7 font-display text-2xl text-ink">Қаратау</span>
-          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Tulipa sp.</span>
-          <span class="col-span-1 arrow text-ink/40">→</span>
-        </li>
-        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
-          <span class="col-span-1 font-display italic text-clay text-lg">02</span>
-          <span class="col-span-7 font-display text-2xl text-ink">Тянь-Шань</span>
-          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Tulipa sp.</span>
-          <span class="col-span-1 arrow text-ink/40">→</span>
-        </li>
-        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
-          <span class="col-span-1 font-display italic text-clay text-lg">03</span>
-          <span class="col-span-7 font-display text-2xl text-ink">Іле Алатауы</span>
-          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Tulipa sp.</span>
-          <span class="col-span-1 arrow text-ink/40">→</span>
-        </li>
-        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
-          <span class="col-span-1 font-display italic text-clay text-lg">04</span>
-          <span class="col-span-7 font-display text-2xl text-ink">Жетісу Алатауы</span>
-          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Tulipa sp.</span>
-          <span class="col-span-1 arrow text-ink/40">→</span>
-        </li>
-        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
-          <span class="col-span-1 font-display italic text-clay text-lg">05</span>
-          <span class="col-span-7 font-display text-2xl text-ink">Бетпақдала</span>
-          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Tulipa sp.</span>
-          <span class="col-span-1 arrow text-ink/40">→</span>
-        </li>
-        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
-          <span class="col-span-1 font-display italic text-clay text-lg">06</span>
-          <span class="col-span-7 font-display text-2xl text-ink">Мойынқұм</span>
-          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Tulipa sp.</span>
-          <span class="col-span-1 arrow text-ink/40">→</span>
-        </li>
-        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2 border-b border-ink/10" data-cursor="hover">
-          <span class="col-span-1 font-display italic text-clay text-lg">07</span>
-          <span class="col-span-7 font-display text-2xl text-ink">Солтүстік Америка</span>
-          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Berberis sp.</span>
-          <span class="col-span-1 arrow text-ink/40">→</span>
-        </li>
-        <li class="reg-item grid grid-cols-12 items-center gap-6 py-6 px-2" data-cursor="hover">
-          <span class="col-span-1 font-display italic text-clay text-lg">08</span>
-          <span class="col-span-7 font-display text-2xl text-ink">Оңтүстік-Шығыс Еуропа</span>
-          <span class="col-span-3 text-xs tracking-[0.2em] uppercase text-ink/50">Syringa sp.</span>
-          <span class="col-span-1 arrow text-ink/40">→</span>
-        </li>
-      </ol>
     </div>
   </div>
 </section>
@@ -580,12 +734,17 @@
   <svg class="absolute -bottom-20 -right-20 w-96 h-96 text-gold/5 a-spin" viewBox="0 0 200 200" fill="currentColor"><circle cx="100" cy="100" r="80"/></svg>
   <div class="max-w-7xl mx-auto px-6 lg:px-10 py-20 grid lg:grid-cols-12 gap-12 relative">
     <div class="lg:col-span-5">
-      <div class="flex items-center gap-3 mb-6">
-        <span class="w-10 h-10 rounded-full bg-gold/90 text-ink flex items-center justify-center font-display text-xl">Ф</span>
-        <span class="font-display text-2xl text-cream">Флора <em class="text-gold not-italic">Қазақстан</em></span>
+      <div class="flex items-center gap-4 mb-6">
+        <span class="relative w-14 h-14 shrink-0 flex items-center justify-center">
+          <img src="logo.png" alt="" class="w-14 h-14 object-contain select-none" draggable="false"/>
+        </span>
+        <span class="flex flex-col leading-none">
+          <span class="text-[9px] tracking-[0.32em] uppercase text-gold/80">Est · 2026</span>
+          <span class="font-display text-2xl text-cream mt-1.5">Botanical <em class="text-gold not-italic">Qazaqstan</em></span>
+        </span>
       </div>
       <p class="max-w-md text-sm leading-relaxed">
-        Диссертациялық жұмыс · 2025 жыл. Қазақстанның бес өсімдік түрінің морфологиясы, систематикасы және таралу аймақтарына арналған визуалды зерттеу.
+        Дипломдық жоба · 2026 жыл. Қазақстанның бес өсімдік түрінің морфологиясы, систематикасы және таралу аймақтарына арналған визуалды зерттеу.
       </p>
     </div>
 
@@ -602,7 +761,7 @@
     <div class="lg:col-span-4">
       <div class="text-[10px] tracking-[0.3em] uppercase text-cream/40 mb-5">Деректер</div>
       <p class="text-sm leading-relaxed mb-5">Барлық деректер ботаникалық зерттеулерге, ашық дереккөздер мен Қазақстан флорасының каталогтарына негізделген.</p>
-      <p class="text-xs text-cream/35 mt-6">© 2025 · Botanical Atlas KZ</p>
+      <p class="text-xs text-cream/35 mt-6">© 2026 · Botanical Atlas KZ</p>
     </div>
   </div>
 </footer>
@@ -638,46 +797,46 @@ const plants = {
   almurt: {
     img: PEAR_IMG, kk: "Алмұрт", lat: "Pyrus communis L.", family: "Rosaceae · Раушангүлділіктер",
     sections: [
-      ["Тұқымдасы", "Rosaceae (Раушангүлділіктер) тұқымдасына жатады."],
-      ["Морфологиясы", "Биіктігі 5–25 метрге дейін жетеді. Тамыр жүйесі тереңге кетеді. Жапырақтары жай, кезектесіп орналасқан, жиектері ара тісті. Гүлдері ақ немесе ақшыл қызғылт, гүлшоғыры қалқанша типті."],
-      ["Жемісі", "Шырынды жалған жеміс. Құрамында қант, органикалық қышқылдар, пектин, дәрумендер және минералды заттар болады. Әсіресе С дәрумені мен калийге бай."],
-      ["Экологиясы", "Жарық пен жылуды жақсы көреді. Құнарлы және ылғалды топырақта жақсы өседі. Негізінен жәндіктер арқылы тозаңданады."]
+      ["Жалпы сипаттамасы", "Алмұрт (Pyrus) — Раушангүлділер тұқымдасына (Rosaceae) жататын көпжылдық жеміс ағашы. Бұл туысқа әлем бойынша 60-тан астам түр кіреді. Алмұрттың табиғи таралу аймағы Еуропа мен Азияның қоңыржай белдеулерін қамтиды. Қазақстанда алмұрттың мәдени және жабайы түрлері оңтүстік және оңтүстік-шығыс аймақтарда кездеседі. Әсіресе тау бөктерлерінде және бау-бақша шаруашылықтарында кеңінен өсіріледі."],
+      ["Морфологиясы", "Алмұрт ағашының биіктігі орта есеппен 5–20 метр аралығында болады. Жапырақтары жай, сопақша пішінді, жиектері майда тісті болып келеді. Гүлдері ақ түсті, хош иісті, көктем мезгілінде гүлдейді. Жемісі шырынды, тәтті әрі дәрумендерге бай. Құрамында қант, органикалық қышқылдар, С дәрумені, калий және басқа да пайдалы заттар кездеседі."],
+      ["Биологиясы", "Алмұрт жарық сүйгіш және құнарлы топырақта жақсы өсетін өсімдік болып табылады. Қуаңшылыққа салыстырмалы түрде төзімді болғанымен, тұрақты суаруды қажет етеді. Көбіне тұқым, телу және қалемше арқылы көбейтіледі. Бұл өсімдік ауыл шаруашылығында маңызды жеміс дақылдарының бірі ретінде жоғары бағаланады."],
+      ["Маңызы", "Алмұрттың экологиялық және шаруашылық маңызы зор. Оның жемістері тағам өнеркәсібінде, медицинада және халықтық емдеуде кеңінен қолданылады. Сонымен қатар, алмұрт ағашы сәндік мақсатта көгалдандыру жұмыстарында да пайдаланылады. Қазақстан жағдайында жергілікті климатқа бейімделген сорттарды өсіру бау-бақша шаруашылығын дамытуда маңызды рөл атқарады."]
     ]
   },
   siren: {
-    img: LILAC_IMG, kk: "Сирень", lat: "Syringa vulgaris L.", family: "Oleaceae · Жасминділер",
+    img: LILAC_IMG, kk: "Сирень", lat: "Syringa vulgaris L.", family: "Oleaceae · Зәйтүндер",
     sections: [
-      ["Тұқымдасы", "Oleaceae (Жасминділер) тұқымдасына жатады."],
-      ["Морфологиясы", "Биіктігі 2–8 метрге жететін көпжылдық бұта. Жапырақтары қарама-қарсы, жүрек тәрізді. Гүлдері ұсақ, түтікше, хош иісті, метелка типтес гүлшоғырында жиналған."],
-      ["Гүлдеу мерзімі", "Сәуір–мамыр айларында молынан гүлдейді. Гүлдерінің түсі ақтан күлгінге дейін әртүрлі реңктерде кездеседі."],
-      ["Қолданылуы", "Парктер мен бақтарда сәндік мақсатта кеңінен өсіріледі. Эфир майы парфюмерияда қолданылады."]
+      ["Жалпы сипаттамасы", "Сирень (Syringa) — Зәйтүндер тұқымдасына (Oleaceae) жататын көпжылдық сәндік бұта. Бұл туысқа шамамен 20–30 түр кіреді. Сирень табиғи түрде Еуропа мен Азияның қоңыржай аймақтарында таралған. Қазақстанда сирень мәдени түрде саябақтарда, ботаникалық бақтарда және көгалдандыру аймақтарында кеңінен өсіріледі."],
+      ["Морфологиясы", "Сиреньнің биіктігі түріне байланысты 2–8 метрге дейін жетеді. Жапырақтары қарама-қарсы орналасқан, жай, жүрек тәрізді немесе сопақша пішінді болады. Гүлдері ұсақ, бірақ көп мөлшерде шоғырланып өседі және өзіне тән жағымды хош иісімен ерекшеленеді. Гүлдерінің түсі ақ, күлгін, көкшіл немесе қызғылт болуы мүмкін. Көктемнің соңында гүлдеп, сәндік көрініс береді."],
+      ["Биологиясы", "Сирень жарық сүйгіш өсімдік болып табылады және құнарлы, жақсы қопсытылған топырақта жақсы өседі. Суыққа төзімді, сондықтан қоңыржай климат жағдайына жақсы бейімделген. Көбіне қалемше, телу және тамыр атпалары арқылы көбейтіледі."],
+      ["Маңызы", "Сиреньнің экологиялық және эстетикалық маңызы зор. Ол елді мекендерді көгалдандыруда, саябақтар мен демалыс аймақтарын безендіруде кеңінен қолданылады. Сонымен қатар, гүлдерінің хош иісі аралар мен басқа да тозаңдандырғыш жәндіктерді тартады. Кейбір түрлері халық медицинасында да қолданыс табады. Сирень қалалық ортаға төзімді сәндік өсімдіктердің бірі ретінде жоғары бағаланады."]
     ]
   },
   bakbak: {
     img: DAND_IMG, kk: "Бақбақ", lat: "Taraxacum officinale F.H.Wigg.", family: "Asteraceae · Күрделігүлділер",
     sections: [
-      ["Тұқымдасы", "Asteraceae (Күрделігүлділер) тұқымдасына жатады."],
-      ["Морфологиясы", "Көпжылдық шөптесін өсімдік. Тамыры жуан, ұзын, өзекті. Жапырақтары негізгі розеткада жиналған, ойықты. Гүл сабағы қуыс."],
-      ["Биологиялық ерекшеліктері", "Барлық бөлігінде ақ сүтті шырын болады. Тұқымдары парашют тәрізді талшықтармен жабдықталған, жел арқылы үлкен қашықтыққа таралады."],
-      ["Дәрілік маңызы", "Тамыры мен жапырағы дәстүрлі медицинада бауыр, өт жолдары ауруларын емдеуде қолданылады."]
+      ["Жалпы сипаттамасы", "Бақбақ (Taraxacum) — Күрделігүлділер тұқымдасына (Asteraceae) жататын көпжылдық шөптесін өсімдік. Бұл туысқа көптеген түрлер кіреді және олар әлемнің қоңыржай белдеулерінде кең таралған. Қазақстанда бақбақтың бірнеше түрі табиғи жағдайда шалғындарда, жайылымдарда, жол жиегінде және тау бөктерлерінде өседі."],
+      ["Морфологиясы", "Бақбақтың тамыры кіндік тәрізді, жуан әрі ұзын болып келеді. Жапырақтары жертаған түрінде орналасып, жиектері тілімденген болады. Гүлдері ашық сары түсті, себет гүлшоғырына жиналған. Өсімдік көктемнен бастап жаз бойы гүлдейді. Жемісі — айдаршалы тұқымша, жел арқылы таралады."],
+      ["Биологиясы", "Бақбақ жарық сүйгіш және әртүрлі топырақ жағдайына бейімделгіш өсімдік болып табылады. Ол тез көбейіп, табиғи ортада кең таралу қабілетімен ерекшеленеді. Тұқым арқылы көбейеді және экологиялық төзімділігі жоғары."],
+      ["Маңызы", "Бақбақтың экологиялық және шаруашылық маңызы зор. Ол аралар үшін маңызды балды өсімдік болып табылады. Сонымен қатар, жапырақтары мен тамыры халық медицинасында және тағам ретінде қолданылады. Құрамында дәрумендер, инулин және биологиялық белсенді заттар кездеседі. Кейбір түрлері топырақтың жағдайын жақсартуға әсер етеді. Бақбақ табиғи экожүйелерде маңызды рөл атқаратын өсімдіктердің бірі болып саналады."]
     ]
   },
   barbaris: {
-    img: BARB_IMG, kk: "Барбарис", lat: "Berberis vulgaris L.", family: "Berberidaceae · Барбарисгүлділер",
+    img: BARB_IMG, kk: "Барбарис", lat: "Berberis vulgaris L.", family: "Berberidaceae · Бөріқарақаттар",
     sections: [
-      ["Тұқымдасы", "Berberidaceae (Барбарисгүлділер) тұқымдасына жатады. 400-ден астам түрі бар туыс."],
-      ["Морфологиясы", "Биіктігі 1–5 метрге дейін жететін тікенекті бұта. Бұтақтары қабырғалы, үш бөлікті тікенектермен жабдықталған."],
-      ["Жемісі", "Сопақша келген қышқыл қызыл жидек. Құрамында С және Е дәрумендері, органикалық қышқылдар көп."],
-      ["Таралуы", "Еуропа, Азия, Солтүстік Америка және Қазақстанда кездеседі. Тас көп жерлер мен орман шеттерін ұнатады."]
+      ["Жалпы сипаттамасы", "Барбарис (Berberis) — Бөріқарақаттар тұқымдасына (Berberidaceae) жататын көпжылдық тікенекті бұта. Бұл туысқа 500-ден астам түр кіреді және олар Еуропа, Азия, Солтүстік Америка аймақтарында кең таралған. Қазақстанда барбаристің жабайы және мәдени түрлері тау бөктерлерінде, орман шеттерінде және сәндік көгалдандыру аймақтарында кездеседі."],
+      ["Морфологиясы", "Барбарис бұтасының биіктігі әдетте 1–3 метр аралығында болады. Сабақтарында үш тармақты тікенектер орналасады. Жапырақтары ұсақ, сопақша пішінді, шоқтанып өседі. Гүлдері сары түсті, майда, шоғыр гүлшоғырына жиналған және көктем мезгілінде гүлдейді. Жемістері ұзынша келген қызыл немесе қою күлгін түсті жидек болып табылады."],
+      ["Биологиясы", "Барбарис жарық сүйгіш, құрғақшылыққа төзімді өсімдік. Ол әртүрлі топырақ жағдайына бейімделе алады және суық климатқа да төзімділігімен ерекшеленеді. Көбіне тұқым, қалемше және бұтаны бөлу арқылы көбейтіледі."],
+      ["Маңызы", "Барбаристің экологиялық және шаруашылық маңызы жоғары. Оның жемістері тағам өнеркәсібінде, сусын және тосап дайындауда кеңінен пайдаланылады. Жеміс құрамында С дәрумені, органикалық қышқылдар және минералды заттар мол кездеседі. Сонымен қатар, барбарис халық медицинасында емдік өсімдік ретінде қолданылады. Сәндік қасиетіне байланысты саябақтар мен бақтарды көгалдандыруда маңызды орын алады."]
     ]
   },
   qyzgaldak: {
     img: TULIP_IMG, kk: "Қызғалдақ", lat: "Tulipa L.", family: "Liliaceae · Лалагүлділер",
     sections: [
-      ["Тұқымдасы", "Liliaceae (Лалагүлділер) тұқымдасына жатады."],
-      ["Морфологиясы", "Көпжылдық пиязшықты өсімдік. Сабағы тік, биіктігі 10–70 см. Жапырақтары ұзынша-ланцет тәрізді, кезектесіп орналасқан."],
-      ["Гүлдеу", "Гүлдері ірі, жалғыз, әртүрлі түсте: қызыл, сары, ақ, қызғылт. Сәуір–мамыр айларында гүлдейді."],
-      ["Қазақстандағы орны", "Қазақстанда 35-тен астам жабайы түрі тіркелген. Қаратау, Тянь-Шань, Іле Алатауы, Жетісу Алатауы, Бетпақдала және Мойынқұм өңірлерінде өседі. Көптеген түрлері Қызыл кітапқа енгізілген."]
+      ["Жалпы сипаттамасы", "Қызғалдақ (Tulipa) — Лалагүлділер тұқымдасына (Liliaceae) жататын көпжылдық пиязшықты өсімдік. Бұл туысқа 100-ден астам түр кіреді. Қызғалдақтардың табиғи таралу орталығы Орталық Азия болып саналады. Қазақстан қызғалдақтардың маңызды генетикалық орталығының бірі болып табылады және мұнда олардың көптеген жабайы түрлері кездеседі. Әсіресе Қазақстан аумағындағы Қаратау, Тянь-Шань және Шу-Іле тауларында кең таралған."],
+      ["Морфологиясы", "Қызғалдақтың биіктігі түріне байланысты 10–70 см аралығында болады. Жапырақтары ұзынша, етті және көкшіл-жасыл түсті келеді. Гүлі ірі, ашық түсті және әртүрлі реңкте кездеседі: қызыл, сары, қызғылт, ақ және күлгін. Көктем мезгілінде гүлдейді. Жемісі — көп тұқымды қауашақ."],
+      ["Биологиясы", "Қызғалдақ жарық сүйгіш өсімдік болып табылады және жақсы құрғатылған топырақта жақсы өседі. Ол көбіне пиязшықтары және тұқымы арқылы көбейеді. Табиғи жағдайда шөлейт және таулы аймақтардың климатына бейімделген."],
+      ["Маңызы", "Қызғалдақтың экологиялық және мәдени маңызы өте зор. Ол көктемгі экожүйелердің маңызды құрамдас бөлігі болып табылады және тозаңдандырғыш жәндіктерді қорекпен қамтамасыз етеді. Сонымен қатар, қызғалдақ әлемдегі ең танымал сәндік өсімдіктердің бірі саналады. Қазақстанда кездесетін кейбір жабайы түрлері сирек кездесетін өсімдіктер қатарына енгізілген және қорғауға алынған. Әсіресе Грейг қызғалдағы мен Кауфман қызғалдағы ғылыми және сәндік тұрғыдан ерекше құнды болып табылады."]
     ]
   }
 };
@@ -813,6 +972,117 @@ document.querySelectorAll('#plants .plant-tile').forEach(tile => {
   });
   tile.addEventListener('mouseleave', () => tile.style.transform = '');
 });
+
+/* ── Kazakhstan distribution map ── */
+const kzViewBox = { width: 100, height: 50, padding: 3 };
+const kzBounds = {
+  lonMin: 46.478279,
+  lonMax: 87.323796,
+  latMin: 40.584656,
+  latMax: 55.43455,
+};
+
+function mercatorY(latitude) {
+  return Math.log(Math.tan(Math.PI / 4 + latitude * Math.PI / 360));
+}
+
+const kzProjection = (() => {
+  const xMin = kzBounds.lonMin * Math.PI / 180;
+  const xMax = kzBounds.lonMax * Math.PI / 180;
+  const yMin = mercatorY(kzBounds.latMin);
+  const yMax = mercatorY(kzBounds.latMax);
+  const scale = Math.min(
+    (kzViewBox.width - kzViewBox.padding * 2) / (xMax - xMin),
+    (kzViewBox.height - kzViewBox.padding * 2) / (yMax - yMin)
+  );
+
+  return {
+    xMin,
+    yMax,
+    scale,
+    xOffset: (kzViewBox.width - (xMax - xMin) * scale) / 2,
+    yOffset: (kzViewBox.height - (yMax - yMin) * scale) / 2,
+  };
+})();
+
+function kzMapPoint(longitude, latitude) {
+  const projectedX = kzProjection.xOffset + (longitude * Math.PI / 180 - kzProjection.xMin) * kzProjection.scale;
+  const projectedY = kzProjection.yOffset + (kzProjection.yMax - mercatorY(latitude)) * kzProjection.scale;
+  return {
+    left: projectedX,
+    top: projectedY / kzViewBox.height * 100,
+  };
+}
+
+const regions = [
+  { id:'karatau',  name:'Қаратау',         coord:'43.5° N · 69° E',   lon:69,   lat:43.5, plant:'Tulipa greigii',      img:TULIP_IMG, desc:'Эндемик қызғалдақтардың табиғи мекені — Қаратау жотасы.' },
+  { id:'tianshan', name:'Тянь-Шань',       coord:'42.5° N · 79° E',   lon:79,   lat:42.5, plant:'Tulipa kaufmanniana', img:TULIP_IMG, desc:'Биік таулы белдеу, Кауфман қызғалдағының отаны.' },
+  { id:'ile',      name:'Іле Алатауы',     coord:'43.2° N · 77° E',   lon:77,   lat:43.2, plant:'Tulipa sp.',           img:TULIP_IMG, desc:'Алматы маңындағы тау бөктерлерінде кеңінен таралған.' },
+  { id:'zhetisu',  name:'Жетісу Алатауы',  coord:'45.0° N · 80° E',   lon:80,   lat:45,   plant:'Berberis sp.',         img:BARB_IMG,  desc:'Барбарис бұталары мен жабайы қызғалдақтар кездеседі.' },
+  { id:'betpak',   name:'Бетпақдала',      coord:'46.0° N · 70° E',   lon:70,   lat:46,   plant:'Tulipa sp.',           img:TULIP_IMG, desc:'Шөлейт жазық — көктемгі эфемероидтар аймағы.' },
+  { id:'moyin',    name:'Мойынқұм',        coord:'44.5° N · 71° E',   lon:71,   lat:44.5, plant:'Pyrus sp.',            img:PEAR_IMG,  desc:'Құмды далада жабайы алмұрт пен сирек өсімдіктер.' },
+  { id:'almaty',   name:'Сирень',          coord:'Алматы маңы · 43.2° N · 76.9° E', lon:76.9, lat:43.2, dx:24, dy:-18, plant:'Syringa vulgaris',     img:LILAC_IMG, desc:'Алматы маңындағы саябақтар мен көгалдандыру аймақтарында сирень кеңінен өсіріледі.' },
+  { id:'aktobe',   name:'Ақтөбе өңірі',    coord:'50.2° N · 57° E',   lon:57,   lat:50.2, plant:'Taraxacum officinale', img:DAND_IMG,  desc:'Солтүстік-батыс далалары — бақбақтың табиғи аймағы.' },
+];
+
+const markersEl = document.getElementById('markers');
+const listEl    = document.getElementById('regionList');
+const info      = document.getElementById('mapInfo');
+const infoImg   = document.getElementById('mapInfoImg');
+const infoName  = document.getElementById('mapInfoName');
+const infoLat   = document.getElementById('mapInfoLat');
+const infoDesc  = document.getElementById('mapInfoDesc');
+
+regions.forEach((region, index) => {
+  const mapPoint = kzMapPoint(region.lon, region.lat);
+  // marker
+  const markerButton = document.createElement('button');
+  markerButton.className = 'kz-marker';
+  markerButton.dataset.id = region.id;
+  markerButton.dataset.cursor = 'hover';
+  markerButton.style.left = `calc(${mapPoint.left}% + ${region.dx || 0}px)`;
+  markerButton.style.top  = `calc(${mapPoint.top}% + ${region.dy || 0}px)`;
+  markerButton.innerHTML = `<span class="ripple"></span><span class="ripple r2"></span><span class="pin"></span><span class="lbl">${region.name}</span>`;
+  markersEl.appendChild(markerButton);
+
+  // list row
+  const listItem = document.createElement('li');
+  listItem.className = 'reg-row';
+  listItem.dataset.id = region.id;
+  listItem.dataset.cursor = 'hover';
+  listItem.innerHTML = `
+    <span class="num">${String(index+1).padStart(2,'0')}</span>
+    <span class="nm">${region.name}</span>
+    <span class="tag">${region.plant}</span>
+    <span class="arr">→</span>`;
+  listEl.appendChild(listItem);
+});
+
+function activate(id) {
+  regions.forEach(region => {
+    const isActive = region.id === id;
+    document.querySelector(`.kz-marker[data-id="${region.id}"]`)?.classList.toggle('active', isActive);
+    document.querySelector(`.reg-row[data-id="${region.id}"]`)?.classList.toggle('active', isActive);
+  });
+  if (!id) {
+    info.style.opacity = '0';
+    info.style.transform = 'translateY(8px)';
+    return;
+  }
+  const region = regions.find(item => item.id === id);
+  infoImg.src = region.img; infoImg.alt = region.name;
+  infoName.textContent = region.name;
+  infoLat.textContent  = region.coord;
+  infoDesc.textContent = `${region.plant} · ${region.desc}`;
+  info.style.opacity = '1';
+  info.style.transform = 'translateY(0)';
+}
+
+document.querySelectorAll('.kz-marker, .reg-row').forEach(el => {
+  el.addEventListener('mouseenter', () => activate(el.dataset.id));
+  el.addEventListener('focus',      () => activate(el.dataset.id));
+});
+activate(regions[0]?.id);
 </script>
 </body>
 </html>
